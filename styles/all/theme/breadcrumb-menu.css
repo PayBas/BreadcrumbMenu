@@ -1,0 +1,81 @@
+/**
+* Breadcrumb Menu - Theme
+*/
+
+li.breadcrumbs {
+	position: relative;
+}
+
+#breadcrumb-menu .dropdown {
+	max-height: inherit;
+	max-width: 250px !important;
+	min-width: 150px;
+	overflow: inherit;
+	position: absolute;
+}
+
+#breadcrumb-menu .dropdown-contents {
+	max-height: inherit;
+	min-width: 150px;
+	overflow: inherit;
+}
+
+#breadcrumb-menu li {
+	margin: 0;
+	padding: 0;
+	position: relative;
+}
+
+#breadcrumb-menu li:first-child {
+	border-top: none;
+	margin: 0;
+}
+
+#breadcrumb-menu li.children:before {
+	content: '›';
+	display: block !important;
+	/*content: '\f054';
+	font-family: FontAwesome;*/
+	font-weight: bold;
+	position: absolute;
+	right: 0;
+	padding: 4px 0;
+}
+#breadcrumb-menu a {
+	display: block;
+	font-weight: normal;
+	padding: 4px 10px 4px 4px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+#breadcrumb-menu a:hover {
+	background: rgba(100,100,100,0.05);
+}
+#breadcrumb-menu .current > a {
+	background: rgba(100,100,100,0.05);
+}
+
+#breadcrumb-menu li.children:hover > .fly-out {
+	display: block;
+}
+
+#breadcrumb-menu .children .dropdown-contents {
+	display: none;
+	position: absolute;
+	left: 97% !important;
+	top: 0;
+}
+
+/* responsive design */
+@media only screen and (max-width: 550px), only screen and (max-device-width: 550px) {
+	/*#breadcrumb-menu .dropdown-contents {
+		max-width: 220px !important;
+	}*/
+}
+
+@media only screen and (max-width: 360px), only screen and (max-device-width: 360px) {
+	#breadcrumb-menu .dropdown-contents {
+		max-width: 220px !important;
+	}
+}

@@ -1,0 +1,5 @@
+services:
+    paybas.breadcrumbmenu.listener:
+        class: paybas\breadcrumbmenu\event\listener
+        tags:
+            - { name: event.listener }

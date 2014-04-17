@@ -1,0 +1,24 @@
+{
+    "name": "paybas/breadcrumbmenu",
+    "type": "phpbb-extension",
+    "description": "This extension adds a drop-down menu to each breadcrumb, containing the sibling and child forums.",
+    "homepage": "http://paybas.com/",
+    "version": "1.0.0",
+    "time": "2014-04-10",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "PayBas",
+            "email": "admin@pbwow.com",
+            "homepage": "http://www.paybas.com",
+            "role": "Lead Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3",
+        "phpbb/phpbb": "3.1.*@dev"
+    },
+    "extra": {
+        "display-name": "Breadcrumb Menu"
+    }
+}
