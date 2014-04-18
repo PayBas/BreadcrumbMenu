@@ -201,27 +201,21 @@ class listener implements EventSubscriberInterface
 
 		$branches[] = $tree; // always include the tree in its entirety too
 		$selectors = array();
-		
+
 		// Construct the selectors, so we can point to the correct place in the multi-dimensional array
-		foreach($parents as $k => $v) {
-
-			//$selector = array();
-			$selector_str = '';
-
-			for($k; $k >= 0; $k--) {
-				//$selector[] = '[children]';
-				//$selector[] = '['.$parents[$k].']';
-				$selector_str = '['.$parents[$k].']["children"]' . $selector_str;
+		foreach ($parents as $k => $parent_id)
+		{
+			$selector = $tree;
+			for ($i = 0; $i <= $k ; $i++)
+			{
+				$selector = $selector[$parents[$i]]["children"];
 			}
-
-			$selector_str = '$tree'.$selector_str.';';
-
-			$selectors[$v] = $selector_str;
-			//$selectors[] = array_reverse($selector);
+			$selectors[$parent_id] = $selector;
 		}
-
-		foreach($selectors as $k => $v) {
-			eval('$branch = '.$v); // TODO: fix this load of crap
+		
+		// Merge all the selected branches into an array
+		foreach ($selectors as $k => $branch)
+		{
 			$branches[] = $branch;
 		}
 		return $branches;
