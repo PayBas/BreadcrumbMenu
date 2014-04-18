@@ -5,7 +5,7 @@
 function toggleBCDropdown(trigger, force) {
 
 	if(!trigger) {
-		$('#page-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this)); });
+		$('#page-header .breadcrumbs .visible, #body-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this)); });
 		return;
 	}
 	var $this = trigger,
@@ -16,7 +16,7 @@ function toggleBCDropdown(trigger, force) {
 
 	if (!visible) {
 		// Hide other dropdown menus
-		$('#page-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this)); });
+		$('#page-header .breadcrumbs .visible, #body-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this)); });
 
 		// Figure out direction of dropdown
 		var direction = options.direction,
@@ -125,9 +125,9 @@ zzztoggleSubmenu = function(e) {
 
 
 $(document).ready(function($){
-	var count = 0;
-	var bcm_timer;
-	$('#page-header .breadcrumbs').children('.crumb').each(function() {
+	var bcmTimer;
+
+	$('#page-header .breadcrumbs, #body-header .breadcrumbs').children('.crumb').each(function() {
 		var $this = $(this);
 		var trigger = $this.find('a');
 		if(!$(trigger).length) { return; }
@@ -140,8 +140,7 @@ $(document).ready(function($){
 		if(isNaN(page) && page == 'index') {
 			dropdown = $('#breadcrumb-menu').find('#branch-index');
 		} else if (!isNaN(page)) {
-			dropdown = $('#breadcrumb-menu').find('#branch-'+count);
-			count++;
+			dropdown = $('#breadcrumb-menu').find('#branch-'+page);
 		} else {
 			return;
 		}
@@ -166,7 +165,7 @@ $(document).ready(function($){
 		//$('.dropdown-toggle-submenu', ops.parent).click(phpbb.toggleSubmenu);
 
 		$(trigger).on("mouseenter",function() {
-			clearTimeout(bcm_timer);
+			clearTimeout(bcmTimer);
 			toggleBCDropdown(trigger, true);
 			$(phpbb.dropdownHandles).each(phpbb.toggleDropdown);
 		})
@@ -174,11 +173,11 @@ $(document).ready(function($){
 
 
 	$('.breadcrumbs').on("mouseenter", function() {
-		clearTimeout(bcm_timer);
+		clearTimeout(bcmTimer);
 	});	
 	$('.breadcrumbs').on("mouseleave", function() {
-		bcm_timer = setTimeout(function() {
-			clearTimeout(bcm_timer);
+		bcmTimer = setTimeout(function() {
+			clearTimeout(bcmTimer);
 			toggleBCDropdown(false);
 		}, 700);
 	});

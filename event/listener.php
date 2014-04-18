@@ -25,7 +25,7 @@ class listener implements EventSubscriberInterface
 	static public function getSubscribedEvents()
 	{
 		return array(
-			'core.page_header_after' => 'generate_menu',
+			'core.page_header' => 'generate_menu',
 		);
 	}
 
@@ -47,13 +47,15 @@ class listener implements EventSubscriberInterface
 
 		$tree = $this->build_tree($list);
 
-		$branches = $this->choose_branches($tree, $current_id, $parents); // TODO: dirty, needs fix
+		$branches = $this->choose_branches($tree, $current_id, $parents);
 
 		$html = $this->build_output($branches);
 
 		unset($list, $tree, $branches);
 
-		$template->assign_vars(array('BREADCRUMB_MENU' => $html));
+		if(!empty($html)) {
+			$template->assign_vars(array('BREADCRUMB_MENU' => $html));
+		}
 	}
 
 
@@ -199,7 +201,10 @@ class listener implements EventSubscriberInterface
 	*/
 	public function choose_branches($tree, $current_id, $parents) {
 
-		$branches[] = $tree; // always include the tree in its entirety too
+		$crumb_ids = $parents;
+		$crumb_ids[] = $current_id;
+
+		$branches[$crumb_ids[0]] = $tree; // always include the tree in its entirety too, see below
 		$selectors = array();
 
 		// Construct the selectors, so we can point to the correct place in the multi-dimensional array
@@ -210,13 +215,16 @@ class listener implements EventSubscriberInterface
 			{
 				$selector = $selector[$parents[$i]]["children"];
 			}
-			$selectors[$parent_id] = $selector;
+			$selectors[] = $selector;
 		}
-		
-		// Merge all the selected branches into an array
+
+		/* Merge all the selected branches into an array. The keys of the branches are _not_ defined by the 
+		position in the tree (the paren'ts ID, as you might expect), but rather by the crumb ID. This is 
+		because we want each breadcrumb's drop-down menu to contain it's _siblings_ and children, rather than 
+		just it's children. These IDs are only used so we can select the right menu faster using JavaScript. */
 		foreach ($selectors as $k => $branch)
 		{
-			$branches[] = $branch;
+			$branches[$crumb_ids[$k+1]] = $branch;
 		}
 		return $branches;
 	}
@@ -227,14 +235,11 @@ class listener implements EventSubscriberInterface
 	public function build_output($branches) {
 
 		$html = '';
-		$count = 0; // we give them a simple ID, which makes the JS side easier (not having to select all kinds of parent/child IDs)
 		foreach($branches as $branch => $array) {
-			$html .= '<div id="branch-' . $count . '" class="dropdown hidden"><div class="pointer"><div class="pointer-inner"></div></div><ul class="dropdown-contents">';
+			$html .= '<div id="branch-' . $branch . '" class="dropdown hidden"><div class="pointer"><div class="pointer-inner"></div></div><ul class="dropdown-contents">';
 			$html .= $this->build_menu($array);
 			$html .= '</ul></div>';
-			$count++;
 		}
-
 		return $html;
 	}
 
