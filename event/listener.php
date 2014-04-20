@@ -50,12 +50,16 @@ class listener implements EventSubscriberInterface
 		$branches = $this->choose_branches($tree, $current_id, $parents);
 
 		$html = $this->build_output($branches);
+		$html_root = $this->build_root_output($branches);
 
 		unset($list, $tree, $branches);
 
 		if(!empty($html))
 		{
-			$template->assign_vars(array('BREADCRUMB_MENU' => $html));
+			$template->assign_vars(array(
+				'BREADCRUMB_MENU' => $html,
+				'BREADCRUMB_ROOT' => $html_root,
+			));
 		}
 	}
 
@@ -249,6 +253,19 @@ class listener implements EventSubscriberInterface
 			$html .= $this->build_menu($array);
 			$html .= '</ul></div>';
 		}
+		return $html;
+	}
+
+	/**
+	* The fly-out menu of the board index does not require the drop-down stuff,
+	* so we do this one seperately.
+	*/
+	public function build_root_output($branches)
+	{
+		$html = '<li class="bcm-root children"><a href="#">Forums</a><div class="fly-out dropdown-contents"><ul>';
+		$html .= $this->build_menu(reset($branches));
+		$html .= '</ul></div>';
+		
 		return $html;
 	}
 
