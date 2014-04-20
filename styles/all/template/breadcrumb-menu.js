@@ -82,8 +82,8 @@ function toggleBCDropdown(trigger, force) {
 			}
 
 			$this.css({
-				left: (trigger.position().left) - 10 + 'px',
-				top: (trigger.height()) - 4 + 'px',
+				left: (trigger.offset().left) - 10 + 'px',
+				top: (trigger.offset().top + trigger.height()) - 4 + 'px',
 				//maxWidth: (windowWidth - 4) + 'px'
 			});
 
@@ -134,14 +134,15 @@ $(document).ready(function($){
 		if(!$(trigger).length) { return; }
 
 		var href = trigger.attr('href');
-		href = href.match(/.*(index).*(&|$)|.*[?&]f=([^&]+)(&|$)/);
-		page = href ? (href[1] ? href[1] : href[3]) : "";
+		matches = href.match(/.*(index).*|.*[?&]t=([^&]+).*|.*[?&]f=([^&]+).*/);
+		forum = matches[1] ? matches[1] : matches[3];
+		topic = matches[2];
 
 		var dropdown;
-		if(isNaN(page) && page == 'index') {
+		if(isNaN(forum) && forum == 'index') {
 			dropdown = $('#breadcrumb-menu').find('#branch-index');
-		} else if (!isNaN(page)) {
-			dropdown = $('#breadcrumb-menu').find('#branch-'+page);
+		} else if (!isNaN(forum) && !topic) {
+			dropdown = $('#breadcrumb-menu').find('#branch-'+forum);
 		} else {
 			return;
 		}
@@ -156,7 +157,7 @@ $(document).ready(function($){
 				upClass: 'dropdown-up', // Class to add to parent item when dropdown opens above menu item
 				downClass: 'dropdown-down', // Class to add to parent item when dropdown opens below menu item
 				dropdown: dropdown,
-				page: page,
+				crumb: forum,
 			};
 
 		//ops.parent.addClass('dropdown-container');
@@ -173,10 +174,10 @@ $(document).ready(function($){
 	});
 
 
-	$('.breadcrumbs').on("mouseenter", function() {
+	$('.breadcrumbs, #breadcrumb-menu').on("mouseenter", function() {
 		clearTimeout(bcmTimer);
 	});	
-	$('.breadcrumbs').on("mouseleave", function() {
+	$('.breadcrumbs, #breadcrumb-menu').on("mouseleave", function() {
 		bcmTimer = setTimeout(function() {
 			clearTimeout(bcmTimer);
 			toggleBCDropdown(false);

@@ -23,6 +23,7 @@ Extension for phpBB 3.1 to turn the breadcrumb navigation into a forum tree menu
 - Include the main tree in the board index crumb (perhaps as a fly-out to the right).
 - Check to see that it doesn't break when other extensions try to prepend/append stuff to the breadcrumbs.
 - Perhaps make an ACP module so admins can set certain vars (such as animations and timers).
+- Eventually, it would be better to only output the whole tree to HTML a single time, and display/hide contents solely using JS. But first we'll do it with PHP and try to keep the JS simple.
 
 ## Installation
 You can install this on the latest copy of the develop branch (phpBB 3.1-dev) by following the steps below.

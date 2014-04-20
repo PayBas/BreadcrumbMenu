@@ -2,16 +2,13 @@
 * Breadcrumb Menu - Theme
 */
 
-li.breadcrumbs {
-	position: relative;
-}
-
 #breadcrumb-menu .dropdown {
 	max-height: inherit;
 	max-width: 250px !important;
 	min-width: 150px;
 	overflow: inherit;
 	position: absolute;
+	font-size: 1.1em;
 }
 
 #breadcrumb-menu .dropdown-contents {
