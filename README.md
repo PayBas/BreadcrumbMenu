@@ -18,6 +18,7 @@ Extension for phpBB 3.1 to turn the breadcrumb navigation into a forum tree menu
 - No language files included/necessary
 
 #### To do list
+- Make fly-out menus using JS instead of just CSS.
 - Make everything responsive.
 - Include the main tree in the board index crumb (perhaps as a fly-out to the right).
 - Check to see that it doesn't break when other extensions try to prepend/append stuff to the breadcrumbs.

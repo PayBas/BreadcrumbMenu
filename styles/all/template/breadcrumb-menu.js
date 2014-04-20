@@ -5,6 +5,7 @@
 function toggleBCDropdown(trigger, force) {
 
 	if(!trigger) {
+		// Hide all dropdown menus, because there is no trigger (meaning a time-out)
 		$('#page-header .breadcrumbs .visible, #body-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this)); });
 		return;
 	}
