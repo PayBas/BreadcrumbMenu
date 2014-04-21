@@ -146,14 +146,14 @@ $(document).ready(function($)
 		// find the useful params of the link href
 		var href = trigger.attr('href');
 		var matches = href.match(/.*(index).*|.*[?&]t=([^&]+).*|.*[?&]f=([^&]+).*/);
-		forum_id = matches[1] ? matches[1] : matches[3];
-		topic_id = matches[2];
+		forum_id = matches ? (matches[1] ? matches[1] : matches[3]) : false;
+		topic_id = matches ? matches[2] : false;
 
 		// find the corresponding branch
 		var dropdown;
 		if(isNaN(forum_id) && forum_id == 'index') {
 			crumb = forum_id;
-		} else if (!isNaN(forum_id) && !topic_id) {
+		} else if (forum_id && !isNaN(forum_id) && !topic_id) {
 			crumb = forum_id;
 		} else {
 			return;
