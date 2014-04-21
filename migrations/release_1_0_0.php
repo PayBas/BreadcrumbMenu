@@ -20,11 +20,6 @@ if (!defined('IN_PHPBB'))
 
 class release_1_0_0 extends \phpbb\db\migration\migration
 {
-	public function effectively_installed()
-	{
-		return isset($this->config['breadcrumbmenu_version']) && version_compare($this->config['breadcrumbmenu_version'], '1.0.0', '>=');
-	}
-	
 	public function update_data()
 	{
 		return array(
