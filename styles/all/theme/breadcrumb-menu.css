@@ -53,12 +53,7 @@
 	background: rgba(100,100,100,0.05);
 }
 
-#breadcrumb-menu li.children:hover > .fly-out {
-	display: block;
-}
-
 #breadcrumb-menu .children .dropdown-contents {
-	display: none;
 	position: absolute;
 	left: 97% !important;
 	top: 0;

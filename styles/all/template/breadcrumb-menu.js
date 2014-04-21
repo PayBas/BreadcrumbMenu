@@ -94,14 +94,44 @@ function toggleBCDropdown(trigger, show)
 			$menu.css('margin-right', '-' + (windowWidth + freeSpace) + 'px');
 		}
 
+
+		// Controls for the sub-menus
+		var bcmSubTimer;
+		var $lastHover = new Array();
+
+		$menu.find('li.children').each(function()
+		{
+			$(this).on({
+				mouseenter: function() {
+					if($(this)[0] == $lastHover[0]) {
+						// try to determine if a user has accidentally just moved outside the menu
+					} else {
+						// the mouse element is different from last time, so we close all the old ones before opening a new one
+						$(this).parent().find('li.visible').toggleClass("visible", false).children('.dropdown-contents').stop(true).hide(200);
+					}
+					$(this).toggleClass("visible", true).children('.dropdown-contents').delay(200).show(200);
+					clearTimeout(bcmSubTimer);
+				},
+				mouseleave: function(e) {
+					//e.stopPropagation();
+					$lastHover = $(this);
+					bcmSubTimer = setTimeout(function() {
+						clearTimeout(bcmSubTimer);
+						$lastHover.parent().children('li.visible').toggleClass("visible", false).children('.dropdown-contents').stop(true).hide(200);
+					}, 600);
+				}
+			});
+		});
+
 	} else if(show && visible) {
 		// Keep it open, do nothing
 	} else {
-		// Hide	a menu
+		// Hide & destroy a menu
 		var $menu = $('#breadcrumb-menu #crumb-menu-' + crumb);
 
 		parent.toggleClass(options.visibleClass, false);
 		$menu.toggleClass('dropdown-visible', false);
+		$menu.stop(true);
 		$menu.hide(300, function(){
 			$menu.remove();
 		});
