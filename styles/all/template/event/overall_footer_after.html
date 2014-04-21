@@ -2,10 +2,12 @@
 <div id="breadcrumb-menu">
 	<ul id="crumb-index" class="hidden">
 		{BREADCRUMB_MENU}
+		<!-- EVENT breadcrumb_menu_prepend -->
 		<!-- IF S_USER_LOGGED_IN --><li><a href="{U_PROFILE}">{L_PROFILE}</a></li><!-- ENDIF -->
 		<!-- IF U_MCP --><li><a href="{U_MCP}">{L_MCP}</a></li><!-- ENDIF -->
 		<!-- IF U_ACP --><li><a href="{U_ACP}">{L_ACP}</a></li><!-- ENDIF -->
 		<!-- IF S_DISPLAY_SEARCH --><li><a href="{U_SEARCH}">{L_SEARCH_ADV}</a></li><!-- ENDIF -->
+		<!-- EVENT breadcrumb_menu_append -->
 		<li><a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a></li>
 	</ul>
 </div>
