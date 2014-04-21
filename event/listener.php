@@ -47,18 +47,14 @@ class listener implements EventSubscriberInterface
 
 		$tree = $this->build_tree($list);
 
-		$branches = $this->choose_branches($tree, $current_id, $parents);
+		$html = $this->build_output($tree);
 
-		$html = $this->build_output($branches);
-		$html_root = $this->build_root_output($branches);
-
-		unset($list, $tree, $branches);
+		unset($list, $tree);
 
 		if(!empty($html))
 		{
 			$template->assign_vars(array(
 				'BREADCRUMB_MENU' => $html,
-				'BREADCRUMB_ROOT' => $html_root,
 			));
 		}
 	}
@@ -77,8 +73,18 @@ class listener implements EventSubscriberInterface
 			FROM ' . FORUMS_TABLE . '
 			ORDER BY left_id ASC';
 		$result = $db->sql_query($sql, 600);
-	
-		$forum_list = array();
+
+		// We include the forum root/index to make tree traversal easier
+		$forum_list[0] = array(
+			'forum_id' 		=> '0',
+			'forum_name' 	=> $user->lang['FORUMS'],
+			'forum_type' 	=> '0',
+			'link' 			=> append_sid("{$phpbb_root_path}index.$phpEx"),
+			'parent_id' 	=> false,
+			'current'		=> false,
+			'current_child'	=> false,
+			'disabled' 		=> false,
+		);
 	
 		// Sometimes it could happen that forums will be displayed here not be displayed within the index page
 		// This is the result of forums not displayed at index, having list permissions and a parent of a forum with no permissions.
@@ -120,6 +126,7 @@ class listener implements EventSubscriberInterface
 				'link' 			=> $u_viewforum,
 				'parent_id' 	=> $row['parent_id'],
 				'current'		=> false,
+				'current_child'	=> false,
 				'disabled' 		=> $disabled,
 			);
 		}
@@ -129,7 +136,7 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	* Get an array of all the current forum's parents (excluding 0)
+	* Get an array of all the current forum's parents
 	*/
 	public function get_crumb_parents($list, $current_id)
 	{
@@ -142,7 +149,7 @@ class listener implements EventSubscriberInterface
 		
 		$parent_id = $list[$current_id]['parent_id'];
 		
-		while($parent_id > 0)
+		while($parent_id)
 		{
 			$parents[] = (int) $parent_id;
 			$parent_id = $list[$parent_id]['parent_id'];
@@ -167,6 +174,13 @@ class listener implements EventSubscriberInterface
 			if(isset($list[$forum_id]))
 			{
 				$list[$forum_id]['current'] = true;
+
+				// we need this to assign an #id to each crumb branch
+				if($list[$forum_id]['parent_id'] >= 0)
+				{
+					$parent_id = $list[$forum_id]['parent_id'];
+					$list[$parent_id]['current_child'] = (int) $forum_id;
+				}
 			}
 		}
 		return $list;
@@ -190,7 +204,7 @@ class listener implements EventSubscriberInterface
 				$children = false;
 				foreach ($list as $x => $y)
 				{
-					if ($y['parent_id'] != false && $y['parent_id'] == $forum_id)
+					if ($y['parent_id'] !== false && $y['parent_id'] == $forum_id)
 					{
 						$children = true;
 						$orphans = true;
@@ -198,7 +212,7 @@ class listener implements EventSubscriberInterface
 					}
 				}
 				// $list[$forum_id] is a child, without children, so i can move it
-				if (!$children && $values['parent_id'] != false)
+				if (!$children && $values['parent_id'] !== false)
 				{
 					$list[$values['parent_id']]['children'][$forum_id] = $values;
 					unset ($list[$forum_id]);
@@ -209,96 +223,34 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	* Chose the branches of the tree for output, based on the current forum and it's parents
+	* Build the tree HTML output (recursively)
 	*/
-	public function choose_branches($tree, $current_id, $parents)
-	{
-		$crumb_ids = $parents;
-		$crumb_ids[] = $current_id;
-
-		$branches[$crumb_ids[0]] = $tree; // always include the tree in its entirety too, see below
-		$selectors = array();
-
-		// Construct the selectors, so we can point to the correct place in the multi-dimensional array
-		foreach ($parents as $level => $parent_id)
-		{
-			$selector = $tree;
-			for ($i = 0; $i <= $level ; $i++)
-			{
-				$selector = $selector[$parents[$i]]["children"];
-			}
-			$selectors[] = $selector;
-		}
-
-		/* Merge all the selected branches into an array. The keys of the branches are _not_ defined by the 
-		position in the tree (the paren'ts ID, as you might expect), but rather by the crumb ID. This is 
-		because we want each breadcrumb's drop-down menu to contain it's _siblings_ and children, rather than 
-		just it's children. These IDs are only used so we can select the right menu faster using JavaScript. */
-		foreach ($selectors as $level => $branch)
-		{
-			$branches[$crumb_ids[$level + 1]] = $branch;
-		}
-		return $branches;
-	}
-
-	/**
-	* Build the overall HTML code of each selected branch
-	*/
-	public function build_output($branches)
-	{
-		$html = '';
-		foreach($branches as $branch => $array)
-		{
-			$html .= '<div id="branch-' . $branch . '" class="dropdown hidden"><div class="pointer"><div class="pointer-inner"></div></div><ul class="dropdown-contents">';
-			$html .= $this->build_menu($array);
-			$html .= '</ul></div>';
-		}
-		return $html;
-	}
-
-	/**
-	* The fly-out menu of the board index does not require the drop-down stuff,
-	* so we do this one seperately.
-	*/
-	public function build_root_output($branches)
-	{
-		$html = '<li class="bcm-root children"><a href="#">Forums</a><div class="fly-out dropdown-contents"><ul>';
-		$html .= $this->build_menu(reset($branches));
-		$html .= '</ul></div>';
-		
-		return $html;
-	}
-
-	/**
-	* Build the menu blocks code (recursively)
-	*/
-	public function build_menu($item)
+	public function build_output($tree)
 	{
 		$html = $childhtml = '';
 
-		foreach ($item as $k => $v)
+		foreach ($tree as $key => $values)
 		{
 
-			if (isset($v['children']))
+			if (isset($values['children']))
 			{
-				$childhtml = $this->build_menu($v['children']);
+				$childhtml = $this->build_output($values['children']);
 			} else {
 				$childhtml = '';
 			}
 	
-			$id = $v['forum_id'];
+			$id = $values['forum_id'];
 			$class = (!empty($childhtml)) ? 'children' : '';
-			$class .= ($v['current'] == true) ? ' current' : '';
+			$class .= ($values['current'] == true) ? ' current' : '';
 
-			$html .= '<li class="bcm-' . $id . ((!empty($class)) ? ' ' . $class : '') . '">';
-
-			$html .= '<a href="' . $v['link'] . '">' . $v['forum_name'] . '</a>';
+			$html .= '<li' . ((!empty($class)) ? ' class="' . $class . '"' : '') . '>';
+			$html .= '<a href="' . $values['link'] . '">' . $values['forum_name'] . '</a>';
 
 			if (!empty($childhtml))
 			{
-				$html .= '<div class="fly-out dropdown-contents"><ul>';
+				$html .= '<ul ' . (!empty($values['current_child']) ? ('id="crumb-' . $values['current_child'] . '" ') : '') . 'class="fly-out dropdown-contents">';
 				$html .= $childhtml;
-				$html .= '</ul></div>';
+				$html .= '</ul>';
 			}
 
 			$html .= "</li>\n";

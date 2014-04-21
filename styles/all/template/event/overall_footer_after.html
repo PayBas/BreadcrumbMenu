@@ -1,17 +1,13 @@
 <!-- IF BREADCRUMB_MENU -->
-<div id="breadcrumb-menu" data-skip-responsive="true">
-	<div id="branch-index" class="dropdown hidden">
-		<div class="pointer"><div class="pointer-inner"></div></div>
-		<ul class="dropdown-contents">
-			<!-- IF BREADCRUMB_ROOT -->{BREADCRUMB_ROOT}<!-- ENDIF -->
-			<!-- IF S_USER_LOGGED_IN --><li><a href="{U_PROFILE}">{L_PROFILE}</a></li><!-- ENDIF -->
-			<!-- IF U_MCP --><li><a href="{U_MCP}">{L_MCP}</a></li><!-- ENDIF -->
-			<!-- IF U_ACP --><li><a href="{U_ACP}">{L_ACP}</a></li><!-- ENDIF -->
-			<!-- IF S_DISPLAY_SEARCH --><li><a href="{U_SEARCH}">{L_SEARCH_ADV}</a></li><!-- ENDIF -->
-			<li><a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a></li>
-		</ul>
-	</div>
-	{BREADCRUMB_MENU}
+<div id="breadcrumb-menu">
+	<ul id="crumb-index" class="hidden">
+		{BREADCRUMB_MENU}
+		<!-- IF S_USER_LOGGED_IN --><li><a href="{U_PROFILE}">{L_PROFILE}</a></li><!-- ENDIF -->
+		<!-- IF U_MCP --><li><a href="{U_MCP}">{L_MCP}</a></li><!-- ENDIF -->
+		<!-- IF U_ACP --><li><a href="{U_ACP}">{L_ACP}</a></li><!-- ENDIF -->
+		<!-- IF S_DISPLAY_SEARCH --><li><a href="{U_SEARCH}">{L_SEARCH_ADV}</a></li><!-- ENDIF -->
+		<li><a href="{U_LOGIN_LOGOUT}">{L_LOGIN_LOGOUT}</a></li>
+	</ul>
 </div>
 <!-- INCLUDEJS @paybas_breadcrumbmenu/breadcrumb-menu.js -->
 <!-- ENDIF -->

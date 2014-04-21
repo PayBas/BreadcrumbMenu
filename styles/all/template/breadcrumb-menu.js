@@ -1,106 +1,110 @@
 /**
-* Dropdown toggle event handler
-* This handler is used by phpBB.registerDropdown() and other functions
+* Breadcrumb Menu event handler
 */
-function toggleBCDropdown(trigger, force) {
-
-	if(!trigger) {
+function toggleBCDropdown(trigger, show)
+{
+	if(!trigger)
+	{
 		// Hide all dropdown menus, because there is no trigger (meaning a time-out)
-		$('#page-header .breadcrumbs .visible, #body-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this)); });
+		$('#page-header .breadcrumbs .visible, #body-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
 		return;
 	}
-	var $this = trigger,
-		options = $this.data('dropdown-options'),
-		parent = options.parent,
-		dropdown = options.dropdown,
-		visible = parent.hasClass(options.visibleClass);
 
-	if (!visible) {
-		// Hide other dropdown menus
-		$('#page-header .breadcrumbs .visible, #body-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this)); });
+	var $trigger = trigger,
+		options = $trigger.data('dropdown-options'),
+		parent = options.parent,
+		visible = parent.hasClass(options.visibleClass),
+		crumb = options.crumb;
+		$container = $('#breadcrumb-menu'),
+		pointer = '<div class="pointer"><div class="pointer-inner"></div></div>';
+
+	if(show && !visible)
+	{
+		// Hide all other dropdown menus
+		$('#page-header .breadcrumbs .visible, #body-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
+
+		// A new crumb has been triggered, so make a new drop-down
+		$container.append('<div id="crumb-menu-' + crumb + '" class="dropdown hidden"></div>');
+		var $menu = $('#breadcrumb-menu #crumb-menu-' + crumb);
+		var $source = $('#breadcrumb-menu #crumb-' + crumb);
+		var dropdown_contents = '<ul class="dropdown-contents">' + $source.html() + '</ul>';
+		$menu.html(pointer + dropdown_contents);
+
 
 		// Figure out direction of dropdown
-		var direction = options.direction,
-			verticalDirection = options.verticalDirection,
-			offset = $this.offset();
-
-		if (direction == 'auto') {
-			if (($(window).width() - $this.outerWidth(true)) / 2 > offset.left) {
-				direction = 'right';
-			}
-			else {
-				direction = 'left';
-			}
-		}
-		dropdown.toggleClass(options.leftClass, direction == 'left').toggleClass(options.rightClass, direction == 'right');
-
-		if (verticalDirection == 'auto') {
-			var height = $(window).height(),
-				top = offset.top - $(window).scrollTop();
-
-			if (top < height * 0.7) {
-				verticalDirection = 'down';
-			}
-			else {
-				verticalDirection = 'up';
-			}
-		}
-		dropdown.toggleClass(options.upClass, verticalDirection == 'up').toggleClass(options.downClass, verticalDirection == 'down');
-	}
-
-	if(force && visible) {
-		// keep it open
-	} else {
-		options.dropdown.toggle(300);
-		parent.toggleClass(options.visibleClass, !visible);
-		options.dropdown.toggleClass('dropdown-visible', !visible);
-	}
-
-	// Check dimensions when showing dropdown
-	// !visible because variable shows state of dropdown before it was toggled
-	if (!visible) {
 		var windowWidth = $(window).width();
 		var windowHeight = $(window).height();
 
-		options.dropdown.each(function() {
-			var $this = $(this);
+		var direction = options.direction,
+			verticalDirection = options.verticalDirection,
+			t_offset = $trigger.offset();
 
-			$this.css({
-				marginLeft: 0,
-				left: 0,
-				//maxWidth: (windowWidth - 4) + 'px'
-			});
-
-			var offset = $this.offset().left,
-				width = $this.outerWidth(true);
-
-			if (offset < 2) {
-				$this.css('left', (2 - offset) + 'px');
+		if (direction == 'auto')
+		{
+			if ((windowWidth - $trigger.outerWidth(true)) / 2 > t_offset.left) {
+				direction = 'right';
+			} else {
+				direction = 'left';
 			}
-			else if ((offset + width + 2) > windowWidth) {
-				$this.css('margin-left', (windowWidth - offset - width - 2) + 'px');
+		}
+		$menu.toggleClass(options.leftClass, direction == 'left').toggleClass(options.rightClass, direction == 'right');
+
+		if (verticalDirection == 'auto')
+		{
+			if ((t_offset.top - $(window).scrollTop()) < windowHeight * 0.7) {
+				verticalDirection = 'down';
+			} else {
+				verticalDirection = 'up';
 			}
+		}
+		$menu.toggleClass(options.upClass, verticalDirection == 'up').toggleClass(options.downClass, verticalDirection == 'down');
 
-			$this.css({
-				left: (trigger.offset().left) - 10 + 'px',
-				top: (trigger.offset().top + trigger.height()) - 4 + 'px',
-				//maxWidth: (windowWidth - 4) + 'px'
-			});
 
+		// Show the menu
+		parent.toggleClass(options.visibleClass, true);
+		$menu.show(300);
+		$menu.toggleClass('dropdown-visible', true);
+
+
+		// Position the menu
+		$menu.css({
+			marginLeft: 0,
+			left: (trigger.offset().left) - 10 + 'px',
+			top: (trigger.offset().top + trigger.height()) - 5 + 'px',
 		});
 
-		options.dropdown.find('.dropdown-contents').each(function() {
-			var $this = $(this);
-			//$this.css('max-height', (windowHeight - trigger.offset().top - trigger.height()) + 'px');
-		});
+		var m_offset = $menu.offset().left,
+			width = $menu.outerWidth(true); // probably won't work during animation
 
+		if (m_offset < 2) {
+			$menu.css('left', (2 - m_offset) + 'px');
+		}
+		else if ((m_offset + width + 2) > windowWidth) {
+			$menu.css('margin-left', (windowWidth - m_offset - width - 2) + 'px');
+		}
+
+		//$menu.css('max-height', (windowHeight - t_offset.top - trigger.height()) + 'px');
+
+		// TODO: check if this actually works
 		var freeSpace = parent.offset().left - 4;
 
 		if (direction == 'left') {
-			options.dropdown.css('margin-left', '-' + freeSpace + 'px');
+			$menu.css('margin-left', '-' + freeSpace + 'px');
 		} else {
-			options.dropdown.css('margin-right', '-' + (windowWidth + freeSpace) + 'px');
+			$menu.css('margin-right', '-' + (windowWidth + freeSpace) + 'px');
 		}
+
+	} else if(show && visible) {
+		// Keep it open, do nothing
+	} else {
+		// Hide	a menu
+		var $menu = $('#breadcrumb-menu #crumb-menu-' + crumb);
+
+		parent.toggleClass(options.visibleClass, false);
+		$menu.toggleClass('dropdown-visible', false);
+		$menu.hide(300, function(){
+			$menu.remove();
+		});
 	}
 
 	// Prevent event propagation
@@ -115,7 +119,6 @@ function toggleBCDropdown(trigger, force) {
 	return false;
 };
 
-
 /**
 * Toggle dropdown submenu
 */
@@ -125,24 +128,33 @@ zzztoggleSubmenu = function(e) {
 }
 
 
-$(document).ready(function($){
+$(document).ready(function($)
+{
 	var bcmTimer;
 
-	$('#page-header .breadcrumbs, #body-header .breadcrumbs').children('.crumb').each(function() {
+	$('#page-header .breadcrumbs, #body-header .breadcrumbs').children('.crumb').each(function()
+	{
 		var $this = $(this);
 		var trigger = $this.find('a');
+		
+		// if a crumb doesn't have a link, do nothing
 		if(!$(trigger).length) { return; }
 
+		// remove those annoying title tooltips
+		$(trigger).removeAttr('title');
+		
+		// find the useful params of the link href
 		var href = trigger.attr('href');
-		matches = href.match(/.*(index).*|.*[?&]t=([^&]+).*|.*[?&]f=([^&]+).*/);
-		forum = matches[1] ? matches[1] : matches[3];
-		topic = matches[2];
+		var matches = href.match(/.*(index).*|.*[?&]t=([^&]+).*|.*[?&]f=([^&]+).*/);
+		forum_id = matches[1] ? matches[1] : matches[3];
+		topic_id = matches[2];
 
+		// find the corresponding branch
 		var dropdown;
-		if(isNaN(forum) && forum == 'index') {
-			dropdown = $('#breadcrumb-menu').find('#branch-index');
-		} else if (!isNaN(forum) && !topic) {
-			dropdown = $('#breadcrumb-menu').find('#branch-'+forum);
+		if(isNaN(forum_id) && forum_id == 'index') {
+			crumb = forum_id;
+		} else if (!isNaN(forum_id) && !topic_id) {
+			crumb = forum_id;
 		} else {
 			return;
 		}
@@ -156,31 +168,29 @@ $(document).ready(function($){
 				rightClass: 'dropdown-right', // Class to add to parent item when dropdown opens to right side
 				upClass: 'dropdown-up', // Class to add to parent item when dropdown opens above menu item
 				downClass: 'dropdown-down', // Class to add to parent item when dropdown opens below menu item
-				dropdown: dropdown,
-				crumb: forum,
+				crumb: forum_id,
 			};
 
-		//ops.parent.addClass('dropdown-container');
+		// assign data to the trigger element
 		trigger.addClass('dropdown-trigger');
 		trigger.data('dropdown-options', ops);
-	
-		//$('.dropdown-toggle-submenu', ops.parent).click(phpbb.toggleSubmenu);
 
-		$(trigger).on("mouseenter",function() {
+		$(trigger).on("mouseenter",function()
+		{
 			clearTimeout(bcmTimer);
 			toggleBCDropdown(trigger, true);
 			$(phpbb.dropdownHandles).each(phpbb.toggleDropdown);
 		})
 	});
 
-
+	// assign listeners to determine if the user has moved away
 	$('.breadcrumbs, #breadcrumb-menu').on("mouseenter", function() {
 		clearTimeout(bcmTimer);
 	});	
 	$('.breadcrumbs, #breadcrumb-menu').on("mouseleave", function() {
 		bcmTimer = setTimeout(function() {
 			clearTimeout(bcmTimer);
-			toggleBCDropdown(false);
+			toggleBCDropdown(false, false);
 		}, 700);
 	});
 
