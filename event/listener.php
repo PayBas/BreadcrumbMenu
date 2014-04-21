@@ -136,8 +136,12 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	* Get an array of all the current forum's parents
-	*/
+	 * Get an array of all the current forum's parents
+	 *
+	 * @param	$list		mixed	The list
+	 * @param	$current_id	int		The id of the current forum
+	 * @return	$parents	array	The parents of the current_id
+	 */
 	public function get_crumb_parents($list, $current_id)
 	{
 		$parents = array();
@@ -158,8 +162,13 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	* Marks the current forum being viewed (and it's parents)
-	*/
+	 * Marks the current forum being viewed (and it's parents)
+	 *
+	 * @param	$list		mixed	The list
+	 * @param	$current_id	int		The id of the current forum
+	 * @param	$parents	array	The parents of the current_id
+	 * @return	$list		mixed	The updated list
+	 */
 	public function mark_current($list, $current_id, $parents)
 	{
 		if($current_id == 0 || empty($list))
@@ -187,60 +196,75 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	* Generate a structured forum tree (multi-dimensional array)
-	* got it from here: http://stackoverflow.com/a/10336597/1894483
-	*/
+	 * Generate a structured forum tree (multi-dimensional array)
+	 * Thanks to Nicofuma
+	 *
+	 * @param	$list	mixed	The list
+	 * @return	$tree	mixed	The tree
+	 */
 	public function build_tree($list)
 	{
-		$tree = array();
-
-		$orphans = true; $i;
-		while ($orphans)
+		reset($list);
+		$tree[0] = $this->build_tree_rec($list, sizeof($list));
+		return $tree;
+	}
+	
+	/**
+	 * Generate a structured forum tree (multi-dimensional array) with a recursive strategy
+	 * Thanks to Nicofuma
+	 *
+	 * @param	$list		mixed	The list
+	 * @param	$length		int		The length of the list
+	 * @return	$tree		mixed	The tree
+	 */
+	public function build_tree_rec(&$list, $length) {
+		// Is the whole list treated ?
+		if (current($list) === false)
 		{
-			$orphans = false;
-			foreach ($list as $forum_id => $values)
+			return false;
+		}
+
+		$tree = current($list);
+
+		// Loop over all children, we stop if we reach the end of the list
+		while (current($list) !== false)
+		{
+			$next = next($list);
+			if (! ($tree['forum_id'] == $next['parent_id']))
 			{
-				// does $list[$forum_id] have children?
-				$children = false;
-				foreach ($list as $x => $y)
-				{
-					if ($y['parent_id'] !== false && $y['parent_id'] == $forum_id)
-					{
-						$children = true;
-						$orphans = true;
-						break;
-					}
-				}
-				// $list[$forum_id] is a child, without children, so i can move it
-				if (!$children && $values['parent_id'] !== false)
-				{
-					$list[$values['parent_id']]['children'][$forum_id] = $values;
-					unset ($list[$forum_id]);
-				}
+				// The current node isn't our child, so we backwards and we return the current tree
+				prev($list);
+				return $tree;
+			}
+			else
+			{
+				// Let our child retrieve its own ones
+				$tree['children'][] = $this->build_tree_rec($list, $length);
 			}
 		}
-		return $list;
+		return $tree;
 	}
 
 	/**
-	* Build the tree HTML output (recursively)
-	*/
+	 * Build the tree HTML output (recursively)
+	 *
+	 * @param	$tree	mixed	The tree
+	 * @return	$html	string	The HTML output
+	 */
 	public function build_output($tree)
 	{
 		$html = $childhtml = '';
 
 		foreach ($tree as $key => $values)
 		{
-
-			if (isset($values['children']))
-			{
+			if (isset($values['children'])) {
 				$childhtml = $this->build_output($values['children']);
 			} else {
 				$childhtml = '';
 			}
-	
-			$id = $values['forum_id'];
+
 			$class = (!empty($childhtml)) ? 'children' : '';
+
 			$class .= ($values['current'] == true) ? ' current' : '';
 
 			$html .= '<li' . ((!empty($class)) ? ' class="' . $class . '"' : '') . '>';
@@ -248,7 +272,7 @@ class listener implements EventSubscriberInterface
 
 			if (!empty($childhtml))
 			{
-				$html .= '<ul ' . (!empty($values['current_child']) ? ('id="crumb-' . $values['current_child'] . '" ') : '') . 'class="fly-out dropdown-contents">';
+				$html .= '<ul ' . (!empty($values['current_child']) ? ('id="crumb-' . $values['current_child'] . '" ') : '') . 'class="fly-out dropdown-contents hidden">';
 				$html .= $childhtml;
 				$html .= '</ul>';
 			}
