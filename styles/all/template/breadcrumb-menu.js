@@ -97,28 +97,28 @@ function toggleBCDropdown(trigger, show)
 
 		// Controls for the sub-menus
 		var bcmSubTimer;
-		var $lastHover = new Array();
+		var $lastHover = new Object();
 
 		$menu.find('li.children').each(function()
 		{
 			$(this).on({
-				mouseenter: function() {
-					if($(this)[0] == $lastHover[0]) {
+				mouseenter: function(e) {
+					if($(this).index($lastHover) >= 0 || $(this).find($lastHover).length) {
 						// try to determine if a user has accidentally just moved outside the menu
 					} else {
 						// the mouse element is different from last time, so we close all the old ones before opening a new one
 						$(this).parent().find('li.visible').toggleClass("visible", false).children('.dropdown-contents').stop(true).hide(200);
 					}
 					$(this).toggleClass("visible", true).children('.dropdown-contents').delay(200).show(200);
+					$lastHover = $(this);
 					clearTimeout(bcmSubTimer);
 				},
 				mouseleave: function(e) {
-					//e.stopPropagation();
-					$lastHover = $(this);
+					$this = $(this);
 					bcmSubTimer = setTimeout(function() {
 						clearTimeout(bcmSubTimer);
-						$lastHover.parent().children('li.visible').toggleClass("visible", false).children('.dropdown-contents').stop(true).hide(200);
-					}, 600);
+						$this.parent().find('li.visible').toggleClass("visible", false).children('.dropdown-contents').stop(true).hide(200);
+					}, 500);
 				}
 			});
 		});
@@ -148,15 +148,6 @@ function toggleBCDropdown(trigger, show)
 	}
 	return false;
 };
-
-/**
-* Toggle dropdown submenu
-*/
-zzztoggleSubmenu = function(e) {
-	$(this).siblings('.dropdown-submenu').toggle();
-	e.preventDefault();
-}
-
 
 $(document).ready(function($)
 {
