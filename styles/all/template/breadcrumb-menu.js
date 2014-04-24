@@ -109,7 +109,14 @@ function toggleBCDropdown(trigger, show)
 						// the mouse element is different from last time, so we close all the old ones before opening a new one
 						$(this).parent().find('li.visible').toggleClass("visible", false).children('.dropdown-contents').stop(true).hide(200);
 					}
-					$(this).toggleClass("visible", true).children('.dropdown-contents').delay(200).show(200);
+					
+					// determine if the subforum should go up or down
+					if(($(this).offset().top - $(window).scrollTop()) < windowHeight * 0.6) {
+						$(this).toggleClass("visible", true).children('.dropdown-contents').delay(200).show(200);
+					} else {
+						$(this).toggleClass("visible", true).children('.dropdown-contents').css({top: "auto", bottom: 0}).delay(200).show(200);
+					}
+
 					$lastHover = $(this);
 					clearTimeout(bcmSubTimer);
 				},

@@ -18,7 +18,6 @@ Extension for phpBB 3.1 to turn the breadcrumb navigation into a forum tree menu
 - No language files included/necessary
 
 #### To do list
-- Make fly-out menus using JS instead of just CSS.
 - Make everything responsive.
 - Perhaps make an ACP module so admins can set certain vars (such as animations and timers).
 
