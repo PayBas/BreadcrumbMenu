@@ -36,8 +36,9 @@ class listener implements EventSubscriberInterface
 	{
 		global $config, $template, $user;
 
-		//$current_id = request_var('f', 0);
-		$current_id = $event['item_id'];
+		// When the event is dispatched from posting.php, the forum_id is not passed, so its better to use the request_var
+		$current_id = request_var('f', 0);
+		//$current_id = $event['item_id']; 
 
 		$list = $this->get_forum_list(false, false, true, false);
 
