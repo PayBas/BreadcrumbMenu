@@ -1,5 +1,15 @@
 services:
     paybas.breadcrumbmenu.listener:
         class: paybas\breadcrumbmenu\event\listener
+        arguments:
+            - @auth
+            - @cache
+            - @config
+            - @dbal.conn
+            - @request
+            - @template
+            - @user
+            - %core.root_path%
+            - %core.php_ext%
         tags:
             - { name: event.listener }

@@ -22,6 +22,46 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class listener implements EventSubscriberInterface
 {
+	/** @var \phpbb\auth\auth */
+	protected $auth;
+
+	/** @var \phpbb\cache\driver\driver_interface */
+	protected $cache;
+
+	/** @var \phpbb\config\config */
+	protected $config;
+
+	/** @var \phpbb\db\driver\driver */
+	protected $db;
+
+	/** @var \phpbb\request\request */
+	protected $request;
+
+	/** @var \phpbb\template\template */
+	protected $template;
+
+	/** @var \phpbb\user */
+	protected $user;
+	
+	/** @var string phpBB root path */
+	protected $root_path;
+	
+	/** @var string PHP extension */
+	protected $phpEx;
+
+	public function __construct(\phpbb\auth\auth $auth, \phpbb\cache\service $cache, \phpbb\config\config $config, \phpbb\db\driver\driver $db, \phpbb\request\request $request, \phpbb\template\template $template, \phpbb\user $user, $root_path, $phpEx)
+	{
+		$this->auth = $auth;
+		$this->cache = $cache;
+		$this->config = $config;
+		$this->db = $db;
+		$this->request = $request;
+		$this->template = $template;
+		$this->user = $user;
+		$this->root_path = $root_path;
+		$this->phpEx = $phpEx;
+	}
+
 	static public function getSubscribedEvents()
 	{
 		return array(
@@ -34,10 +74,8 @@ class listener implements EventSubscriberInterface
 	*/
 	public function generate_menu($event)
 	{
-		global $config, $template, $user;
-
-		// When the event is dispatched from posting.php, the forum_id is not passed, so its better to use the request_var
-		$current_id = request_var('f', 0);
+		// When the event is dispatched from posting.php, the forum_id is not passed, so its better to use request->variable
+		$current_id = $this->request->variable('f', 0);
 		//$current_id = $event['item_id']; 
 
 		$list = $this->get_forum_list(false, false, true, false);
@@ -54,33 +92,29 @@ class listener implements EventSubscriberInterface
 
 		if(!empty($html))
 		{
-			$template->assign_vars(array(
+			$this->template->assign_vars(array(
 				'BREADCRUMB_MENU' => $html,
 			));
 		}
 	}
-
 
 	/**
 	* Modified version of the jumpbox, just lists authed forums (in the correct order)
 	*/
 	function get_forum_list($ignore_id = false, $ignore_acl = false, $ignore_nonpost = false, $ignore_emptycat = true, $only_acl_post = false)
 	{
-		global $db, $user, $auth, $cache;
-		global $phpbb_root_path, $phpEx;
-	
 		// This query is identical to the jumpbox one
 		$sql = 'SELECT forum_id, forum_name, parent_id, forum_type, forum_flags, forum_options, left_id, right_id
 			FROM ' . FORUMS_TABLE . '
 			ORDER BY left_id ASC';
-		$result = $db->sql_query($sql, 600);
+		$result = $this->db->sql_query($sql, 600);
 
 		// We include the forum root/index to make tree traversal easier
 		$forum_list[0] = array(
 			'forum_id' 		=> '0',
-			'forum_name' 	=> $user->lang['FORUMS'],
+			'forum_name' 	=> $this->user->lang['FORUMS'],
 			'forum_type' 	=> '0',
-			'link' 			=> append_sid("{$phpbb_root_path}index.$phpEx"),
+			'link' 			=> append_sid("{$this->root_path}index.$this->phpEx"),
 			'parent_id' 	=> false,
 			'current'		=> false,
 			'current_child'	=> false,
@@ -91,13 +125,13 @@ class listener implements EventSubscriberInterface
 		// This is the result of forums not displayed at index, having list permissions and a parent of a forum with no permissions.
 		// If this happens, the padding could be "broken"
 	
-		while ($row = $db->sql_fetchrow($result))
+		while ($row = $this->db->sql_fetchrow($result))
 		{
 			$disabled = false;
 
-			if (!$ignore_acl && $auth->acl_gets(array('f_list', 'a_forum', 'a_forumadd', 'a_forumdel'), $row['forum_id']))
+			if (!$ignore_acl && $this->auth->acl_gets(array('f_list', 'a_forum', 'a_forumadd', 'a_forumdel'), $row['forum_id']))
 			{
-				if ($only_acl_post && !$auth->acl_get('f_post', $row['forum_id']) || (!$auth->acl_get('m_approve', $row['forum_id']) && !$auth->acl_get('f_noapprove', $row['forum_id'])))
+				if ($only_acl_post && !$this->auth->acl_get('f_post', $row['forum_id']) || (!$this->auth->acl_get('m_approve', $row['forum_id']) && !$this->auth->acl_get('f_noapprove', $row['forum_id'])))
 				{
 					$disabled = true;
 				}
@@ -119,7 +153,7 @@ class listener implements EventSubscriberInterface
 				$disabled = true;
 			}
 
-			$u_viewforum = append_sid("{$phpbb_root_path}viewforum.$phpEx", 'f=' . $row['forum_id']);
+			$u_viewforum = append_sid("{$this->root_path}viewforum.$this->phpEx", 'f=' . $row['forum_id']);
 			$forum_list[$row['forum_id']] = array(
 				'forum_id' 		=> $row['forum_id'],
 				'forum_name' 	=> $row['forum_name'],
@@ -131,7 +165,7 @@ class listener implements EventSubscriberInterface
 				'disabled' 		=> $disabled,
 			);
 		}
-		$db->sql_freeresult($result);
+		$this->db->sql_freeresult($result);
 
 		return $forum_list;
 	}

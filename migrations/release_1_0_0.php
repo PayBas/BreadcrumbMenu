@@ -26,4 +26,11 @@ class release_1_0_0 extends \phpbb\db\migration\migration
 			array('config.add', array('breadcrumbmenu_version', '1.0.0')),
 		);
 	}
+
+	public function revert_data()
+	{
+		return array(
+			array('config.remove', array('breadcrumbmenu_version')),
+		);
+	}
 }
