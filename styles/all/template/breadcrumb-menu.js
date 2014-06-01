@@ -6,7 +6,7 @@ function toggleBCDropdown(trigger, show)
 	if(!trigger)
 	{
 		// Hide all dropdown menus, because there is no trigger (meaning a time-out)
-		$('#page-header .breadcrumbs .visible, #body-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
+		$('.breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
 		return;
 	}
 
@@ -21,7 +21,7 @@ function toggleBCDropdown(trigger, show)
 	if(show && !visible)
 	{
 		// Hide all other dropdown menus
-		$('#page-header .breadcrumbs .visible, #body-header .breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
+		$('.breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
 
 		// A new crumb has been triggered, so make a new drop-down
 		$container.append('<div id="crumb-menu-' + crumb + '" class="dropdown hidden"></div>');
@@ -67,11 +67,20 @@ function toggleBCDropdown(trigger, show)
 
 
 		// Position the menu
-		$menu.css({
-			marginLeft: 0,
-			left: (trigger.offset().left) - 10 + 'px',
-			top: (trigger.offset().top + trigger.height()) - 5 + 'px',
-		});
+		if (verticalDirection == 'up')
+		{
+			$menu.css({
+				marginLeft: 0,
+				left: t_offset.left + 'px',
+				top: t_offset.top - $menu.outerHeight() + 'px',
+			});
+		} else {
+			$menu.css({
+				marginLeft: 0,
+				left: t_offset.left + 'px',
+				top: t_offset.top + trigger.height() + 'px',
+			});
+		}
 
 		var m_offset = $menu.offset().left,
 			width = $menu.outerWidth(true); // probably won't work during animation
@@ -160,7 +169,7 @@ $(document).ready(function($)
 {
 	var bcmTimer;
 
-	$('#page-header .breadcrumbs, #body-header .breadcrumbs').children('.crumb').each(function()
+	$('.breadcrumbs').children('.crumb').each(function()
 	{
 		var $this = $(this);
 		var trigger = $this.find('a');

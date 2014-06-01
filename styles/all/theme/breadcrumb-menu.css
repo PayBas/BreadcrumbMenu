@@ -59,6 +59,21 @@
 	top: 0;
 }
 
+#breadcrumb-menu .dropdown-down {
+	margin-top: 0px;
+}
+#breadcrumb-menu .dropdown-up {
+	top: auto;
+	bottom: 1.2em;
+	padding: 0 0 9px;
+}
+#breadcrumb-menu .dropdown-left {
+
+}
+#breadcrumb-menu .dropdown-right {
+	margin-left: -10px;
+}
+
 /* responsive design */
 @media only screen and (max-width: 550px), only screen and (max-device-width: 550px) {
 	/*#breadcrumb-menu .dropdown-contents {
