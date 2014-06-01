@@ -25,11 +25,10 @@ function toggleBCDropdown(trigger, show)
 
 		// A new crumb has been triggered, so make a new drop-down
 		$container.append('<div id="crumb-menu-' + crumb + '" class="dropdown hidden"></div>');
-		var $menu = $('#breadcrumb-menu #crumb-menu-' + crumb);
+		var $menu = $container.children('#breadcrumb-menu #crumb-menu-' + crumb);
 		var $source = $('#breadcrumb-menu #crumb-' + crumb);
 		var dropdown_contents = '<ul class="dropdown-contents">' + $source.html() + '</ul>';
 		$menu.html(pointer + dropdown_contents);
-
 
 		// Figure out direction of dropdown
 		var windowWidth = $(window).width();
@@ -59,12 +58,13 @@ function toggleBCDropdown(trigger, show)
 		}
 		$menu.toggleClass(options.upClass, verticalDirection == 'up').toggleClass(options.downClass, verticalDirection == 'down');
 
+		// Use jQuery UI to construct the menu
+		$menu.children('.dropdown-contents').menu({ position: { my: "left top", at: "right top-6" } });
 
 		// Show the menu
 		parent.toggleClass(options.visibleClass, true);
 		$menu.show(300);
 		$menu.toggleClass('dropdown-visible', true);
-
 
 		// Position the menu
 		if (verticalDirection == 'up')
@@ -103,42 +103,6 @@ function toggleBCDropdown(trigger, show)
 			$menu.css('margin-right', '-' + (windowWidth + freeSpace) + 'px');
 		}
 
-
-		// Controls for the sub-menus
-		var bcmSubTimer;
-		var $lastHover = new Object();
-
-		$menu.find('li.children').each(function()
-		{
-			$(this).on({
-				mouseenter: function(e) {
-					if($(this).index($lastHover) >= 0 || $(this).find($lastHover).length) {
-						// try to determine if a user has accidentally just moved outside the menu
-					} else {
-						// the mouse element is different from last time, so we close all the old ones before opening a new one
-						$(this).parent().find('li.visible').toggleClass("visible", false).children('.dropdown-contents').stop(true).hide(200);
-					}
-					
-					// determine if the subforum should go up or down
-					if(($(this).offset().top - $(window).scrollTop()) < windowHeight * 0.6) {
-						$(this).toggleClass("visible", true).children('.dropdown-contents').delay(200).show(200);
-					} else {
-						$(this).toggleClass("visible", true).children('.dropdown-contents').css({top: "auto", bottom: 0}).delay(200).show(200);
-					}
-
-					$lastHover = $(this);
-					clearTimeout(bcmSubTimer);
-				},
-				mouseleave: function(e) {
-					$this = $(this);
-					bcmSubTimer = setTimeout(function() {
-						clearTimeout(bcmSubTimer);
-						$this.parent().find('li.visible').toggleClass("visible", false).children('.dropdown-contents').stop(true).hide(200);
-					}, 500);
-				}
-			});
-		});
-
 	} else if(show && visible) {
 		// Keep it open, do nothing
 	} else {
@@ -149,6 +113,7 @@ function toggleBCDropdown(trigger, show)
 		$menu.toggleClass('dropdown-visible', false);
 		$menu.stop(true);
 		$menu.hide(300, function(){
+			$menu.children('.dropdown-contents').menu("destroy");
 			$menu.remove();
 		});
 	}
@@ -167,30 +132,27 @@ function toggleBCDropdown(trigger, show)
 
 $(document).ready(function($)
 {
-	var bcmTimer;
+	var showTimer;
+	var hideTimer;
 
 	$('.breadcrumbs').children('.crumb').each(function()
 	{
 		var $this = $(this);
 		var trigger = $this.find('a');
-		
+
 		// if a crumb doesn't have a link, do nothing
 		if(!$(trigger).length) { return; }
 
 		// remove those annoying title tooltips
 		$(trigger).removeAttr('title');
-		
-		// find the useful params of the link href
-		var href = trigger.attr('href');
-		var matches = href.match(/.*(index).*|.*[?&]t=([^&]+).*|.*[?&]f=([^&]+).*/);
-		forum_id = matches ? (matches[1] ? matches[1] : matches[3]) : false;
-		topic_id = matches ? matches[2] : false;
 
-		// find the corresponding branch
-		var dropdown;
-		if(isNaN(forum_id) && forum_id == 'index') {
-			crumb = forum_id;
-		} else if (forum_id && !isNaN(forum_id) && !topic_id) {
+		// find the link reference
+		var forum_ref = trigger.attr('data-navbar-reference');
+		var forum_id = trigger.attr('data-forum-id');
+
+		if(typeof forum_ref != 'undefined') {
+			crumb = forum_ref
+		} else if(!isNaN(forum_id)) {
 			crumb = forum_id;
 		} else {
 			return;
@@ -205,30 +167,40 @@ $(document).ready(function($)
 				rightClass: 'dropdown-right', // Class to add to parent item when dropdown opens to right side
 				upClass: 'dropdown-up', // Class to add to parent item when dropdown opens above menu item
 				downClass: 'dropdown-down', // Class to add to parent item when dropdown opens below menu item
-				crumb: forum_id,
+				crumb: crumb,
 			};
 
 		// assign data to the trigger element
 		trigger.addClass('dropdown-trigger');
 		trigger.data('dropdown-options', ops);
 
-		$(trigger).on("mouseenter",function()
-		{
-			clearTimeout(bcmTimer);
-			toggleBCDropdown(trigger, true);
-			$(phpbb.dropdownHandles).each(phpbb.toggleDropdown);
+		$(trigger).on({
+			"mouseenter": function()
+			{
+				clearTimeout(hideTimer);
+	
+				showTimer = setTimeout(function() {
+					toggleBCDropdown(trigger, true);
+					$(phpbb.dropdownHandles).each(phpbb.toggleDropdown);
+				}, 300);
+			},
+			"mouseleave": function()
+			{
+				clearTimeout(showTimer);
+			}
 		})
 	});
 
 	// assign listeners to determine if the user has moved away
-	$('.breadcrumbs, #breadcrumb-menu').on("mouseenter", function() {
-		clearTimeout(bcmTimer);
-	});	
-	$('.breadcrumbs, #breadcrumb-menu').on("mouseleave", function() {
-		bcmTimer = setTimeout(function() {
-			clearTimeout(bcmTimer);
-			toggleBCDropdown(false, false);
-		}, 700);
+	$('.breadcrumbs, #breadcrumb-menu').on({
+		"mouseenter": function() {
+			clearTimeout(hideTimer);
+		},
+		"mouseleave": function() {
+			hideTimer = setTimeout(function() {
+				clearTimeout(hideTimer);
+				toggleBCDropdown(false, false);
+			}, 700);
+		}
 	});
-
 });

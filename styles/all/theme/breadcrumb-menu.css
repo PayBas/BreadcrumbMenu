@@ -28,23 +28,21 @@
 	margin: 0;
 }
 
-#breadcrumb-menu li.children:before {
-	content: '›';
-	display: block !important;
-	/*content: '\f054';
-	font-family: FontAwesome;*/
-	font-weight: bold;
-	position: absolute;
-	right: 0;
-	padding: 4px 0;
-}
 #breadcrumb-menu a {
 	display: block;
 	font-weight: normal;
-	padding: 4px 10px 4px 4px;
+	padding: 4px 12px 4px 4px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+}
+#breadcrumb-menu li.children > a:before {
+	content: '›';
+	/*content: '\f054';
+	font-family: FontAwesome;*/
+	font-weight: bold;
+	right: 2px;
+	position: absolute;
 }
 #breadcrumb-menu a:hover {
 	background: rgba(100,100,100,0.05);
@@ -55,7 +53,7 @@
 
 #breadcrumb-menu .children .dropdown-contents {
 	position: absolute;
-	left: 97% !important;
+	left: 100%;
 	top: 0;
 }
 
@@ -69,9 +67,6 @@
 }
 #breadcrumb-menu .dropdown-left {
 
-}
-#breadcrumb-menu .dropdown-right {
-	margin-left: -10px;
 }
 
 /* responsive design */
