@@ -11,6 +11,10 @@
 	font-size: 1.1em;
 }
 
+#breadcrumb-menu .hidden {
+	display: none;
+}
+
 #breadcrumb-menu .dropdown-contents {
 	max-height: inherit;
 	min-width: 150px;

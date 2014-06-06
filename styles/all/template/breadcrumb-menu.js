@@ -1,17 +1,16 @@
 /**
 * Breadcrumb Menu event handler
 */
-function toggleBCDropdown(trigger, show)
+function toggleBCDropdown($trigger, show)
 {
-	if(!trigger)
+	if(!$trigger)
 	{
 		// Hide all dropdown menus, because there is no trigger (meaning a time-out)
 		$('.breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
 		return;
 	}
 
-	var $trigger = trigger,
-		options = $trigger.data('dropdown-options'),
+	var options = $trigger.data('dropdown-options'),
 		parent = options.parent,
 		visible = parent.hasClass(options.visibleClass),
 		crumb = options.crumb;
@@ -59,7 +58,7 @@ function toggleBCDropdown(trigger, show)
 		$menu.toggleClass(options.upClass, verticalDirection == 'up').toggleClass(options.downClass, verticalDirection == 'down');
 
 		// Use jQuery UI to construct the menu
-		$menu.children('.dropdown-contents').menu({ position: { my: "left top", at: "right top-6" } });
+		$menu.children('.dropdown-contents').menu({ position: { my: 'left top', at: 'right top-6' } });
 
 		// Show the menu
 		parent.toggleClass(options.visibleClass, true);
@@ -78,7 +77,7 @@ function toggleBCDropdown(trigger, show)
 			$menu.css({
 				marginLeft: 0,
 				left: t_offset.left + 'px',
-				top: t_offset.top + trigger.height() + 'px',
+				top: t_offset.top + $trigger.height() + 'px',
 			});
 		}
 
@@ -92,7 +91,7 @@ function toggleBCDropdown(trigger, show)
 			$menu.css('margin-left', (windowWidth - m_offset - width - 2) + 'px');
 		}
 
-		//$menu.css('max-height', (windowHeight - t_offset.top - trigger.height()) + 'px');
+		//$menu.css('max-height', (windowHeight - t_offset.top - $trigger.height()) + 'px');
 
 		// TODO: check if this actually works
 		var freeSpace = parent.offset().left - 4;
@@ -113,7 +112,7 @@ function toggleBCDropdown(trigger, show)
 		$menu.toggleClass('dropdown-visible', false);
 		$menu.stop(true);
 		$menu.hide(300, function(){
-			$menu.children('.dropdown-contents').menu("destroy");
+			$menu.children('.dropdown-contents').menu('destroy');
 			$menu.remove();
 		});
 	}
@@ -132,23 +131,25 @@ function toggleBCDropdown(trigger, show)
 
 $(document).ready(function($)
 {
-	var showTimer;
-	var hideTimer;
+	var showTimer,
+		hideTimer,
+		touchTimer;
 
 	$('.breadcrumbs').children('.crumb').each(function()
 	{
 		var $this = $(this);
-		var trigger = $this.find('a');
+		var $trigger = $this.find('a');
 
 		// if a crumb doesn't have a link, do nothing
-		if(!$(trigger).length) { return; }
+		if(!$trigger.length) { return; }
 
 		// remove those annoying title tooltips
-		$(trigger).removeAttr('title');
+		$trigger.removeAttr('title');
 
 		// find the link reference
-		var forum_ref = trigger.attr('data-navbar-reference');
-		var forum_id = trigger.attr('data-forum-id');
+		var forum_ref = $trigger.attr('data-navbar-reference'),
+			forum_id = parseInt($trigger.attr('data-forum-id')),
+			crumb;
 
 		if(typeof forum_ref != 'undefined') {
 			crumb = forum_ref
@@ -157,7 +158,7 @@ $(document).ready(function($)
 		} else {
 
 			// fall-back in case #2530 isn't available
-			var href = trigger.attr('href');
+			var href = $trigger.attr('href');
 			var matches = href.match(/.*(index).*|.*[?&]t=([^&]+).*|.*[?&]f=([^&]+).*/);
 			forum_id = matches ? (matches[1] ? matches[1] : matches[3]) : false;
 			topic_id = matches ? matches[2] : false;
@@ -172,7 +173,7 @@ $(document).ready(function($)
 		}
 
 		var ops = {
-				parent: trigger.parent(), // Parent item to add classes to
+				parent: $trigger.parent(), // Parent item to add classes to
 				direction: 'auto', // Direction of dropdown menu. Possible values: auto, left, right
 				verticalDirection: 'auto', // Vertical direction. Possible values: auto, up, down
 				visibleClass: 'visible', // Class to add to parent item when dropdown is visible
@@ -184,32 +185,55 @@ $(document).ready(function($)
 			};
 
 		// assign data to the trigger element
-		trigger.addClass('dropdown-trigger');
-		trigger.data('dropdown-options', ops);
+		$trigger.addClass('dropdown-trigger');
+		$trigger.data('dropdown-options', ops);
 
-		$(trigger).on({
-			"mouseenter": function()
+		if (phpbb.isTouch) {
+			$trigger.on({
+				'click' : function(event)
+				{
+					event.preventDefault();
+				},
+				'touchstart': function(event)
+				{
+					touchTimer = setTimeout(function() {
+						clearTimeout(touchTimer);
+						touchTimer = true;
+					}, 300);
+				},
+				'touchend': function(event)
+				{
+					if (touchTimer === true) {
+						location.href = $trigger.attr('href');
+					}
+					clearTimeout(touchTimer);
+				}
+			});
+		}
+
+		$trigger.on({
+			'mouseenter': function()
 			{
 				clearTimeout(hideTimer);
 	
 				showTimer = setTimeout(function() {
-					toggleBCDropdown(trigger, true);
+					toggleBCDropdown($trigger, true);
 					$(phpbb.dropdownHandles).each(phpbb.toggleDropdown);
 				}, 300);
 			},
-			"mouseleave": function()
+			'mouseleave': function()
 			{
 				clearTimeout(showTimer);
 			}
-		})
+		});
 	});
 
 	// assign listeners to determine if the user has moved away
 	$('.breadcrumbs, #breadcrumb-menu').on({
-		"mouseenter": function() {
+		'mouseenter': function() {
 			clearTimeout(hideTimer);
 		},
-		"mouseleave": function() {
+		'mouseleave': function() {
 			hideTimer = setTimeout(function() {
 				clearTimeout(hideTimer);
 				toggleBCDropdown(false, false);
