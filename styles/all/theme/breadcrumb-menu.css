@@ -37,7 +37,7 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-#breadcrumb-menu li.children > a:before {
+#breadcrumb-menu .children > a:before {
 	content: '›';
 	/*content: '\f054';
 	font-family: FontAwesome;*/
