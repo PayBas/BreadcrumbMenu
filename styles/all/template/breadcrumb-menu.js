@@ -29,6 +29,9 @@ function toggleBCDropdown($trigger, show)
 		var dropdown_contents = '<ul class="dropdown-contents">' + $source.html() + '</ul>';
 		$menu.html(pointer + dropdown_contents);
 
+		// Get the padding of the dropdown-contents
+		var padding = parseInt($menu.find('.dropdown-contents').css('padding-top')) + 1;
+
 		// Figure out direction of dropdown
 		var windowWidth = $(window).width();
 		var windowHeight = $(window).height();
@@ -58,11 +61,16 @@ function toggleBCDropdown($trigger, show)
 		$menu.toggleClass(options.upClass, verticalDirection == 'up').toggleClass(options.downClass, verticalDirection == 'down');
 
 		// Use jQuery UI to construct the menu
-		$menu.children('.dropdown-contents').menu({ position: { my: 'left top', at: 'right top-6' } });
+		$menu.children('.dropdown-contents').menu({ position: { my: 'left top', at: 'right top-' + padding } });
 
 		// Show the menu
 		parent.toggleClass(options.visibleClass, true);
-		$menu.show(300);
+		if (verticalDirection == 'up') {
+			$menu.css('height', $menu.height()); // Fix weird issue where container height is messed up
+			$menu.fadeIn(300);
+		} else {
+			$menu.show(300);
+		}
 		$menu.toggleClass('dropdown-visible', true);
 
 		// Position the menu

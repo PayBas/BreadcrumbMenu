@@ -3,10 +3,6 @@
 */
 
 #breadcrumb-menu .dropdown {
-	max-height: inherit;
-	max-width: 250px !important;
-	min-width: 150px;
-	overflow: inherit;
 	position: absolute;
 	font-size: 1.1em;
 }
@@ -17,7 +13,8 @@
 
 #breadcrumb-menu .dropdown-contents {
 	max-height: inherit;
-	min-width: 150px;
+	max-width: 250px !important;
+	min-width: 130px;
 	overflow: inherit;
 }
 
@@ -61,23 +58,15 @@
 	top: 0;
 }
 
-#breadcrumb-menu .dropdown-down {
-	margin-top: 0px;
-}
 #breadcrumb-menu .dropdown-up {
-	top: auto;
-	bottom: 1.2em;
 	padding: 0 0 9px;
-}
-#breadcrumb-menu .dropdown-left {
-
 }
 
 /* responsive design */
 @media only screen and (max-width: 550px), only screen and (max-device-width: 550px) {
-	/*#breadcrumb-menu .dropdown-contents {
-		max-width: 220px !important;
-	}*/
+	#breadcrumb-menu .dropdown-contents {
+		min-width: inherit;
+	}
 }
 
 @media only screen and (max-width: 360px), only screen and (max-device-width: 360px) {
