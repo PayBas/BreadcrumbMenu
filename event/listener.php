@@ -74,9 +74,9 @@ class listener implements EventSubscriberInterface
 	*/
 	public function generate_menu($event)
 	{
-		// When the event is dispatched from posting.php, the forum_id is not passed, so its better to use request->variable
+		// When the event is dispatched from posting.php, the forum_id is not passed, 
+		// so its better to use request->variable instead of $event['item_id']
 		$current_id = $this->request->variable('f', 0);
-		//$current_id = $event['item_id']; 
 
 		$list = $this->get_forum_list(false, false, true, false);
 
