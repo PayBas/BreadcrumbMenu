@@ -3,8 +3,7 @@
 */
 function toggleBCDropdown($trigger, show)
 {
-	if(!$trigger)
-	{
+	if(!$trigger) {
 		// Hide all dropdown menus, because there is no trigger (meaning a time-out)
 		$('.breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
 		return;
@@ -17,8 +16,7 @@ function toggleBCDropdown($trigger, show)
 		$container = $('#breadcrumb-menu'),
 		pointer = '<div class="pointer"><div class="pointer-inner"></div></div>';
 
-	if(show && !visible)
-	{
+	if(show && !visible) {
 		// Hide all other dropdown menus
 		$('.breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
 
@@ -28,9 +26,10 @@ function toggleBCDropdown($trigger, show)
 		var $source = $('#breadcrumb-menu #crumb-' + crumb);
 		var dropdown_contents = '<ul class="dropdown-contents">' + $source.html() + '</ul>';
 		$menu.html(pointer + dropdown_contents);
+		var $dropdown_contents = $menu.find('.dropdown-contents');
 
 		// Get the padding of the dropdown-contents
-		var padding = parseInt($menu.find('.dropdown-contents').css('padding-top')) + 1;
+		var padding = parseInt($dropdown_contents.css('padding-top')) + 1;
 
 		// Figure out direction of dropdown
 		var windowWidth = $(window).width();
@@ -38,20 +37,21 @@ function toggleBCDropdown($trigger, show)
 
 		var direction = options.direction,
 			verticalDirection = options.verticalDirection,
-			t_offset = $trigger.offset();
+			t_offset = $trigger.offset(),
+			flyout_dir = (direction == 'left') ? 'right' : 'left';
 
-		if (direction == 'auto')
-		{
+		if (direction == 'auto') {
 			if ((windowWidth - $trigger.outerWidth(true)) / 2 > t_offset.left) {
 				direction = 'right';
+				flyout_dir = 'left';
 			} else {
 				direction = 'left';
+				flyout_dir = 'right';
 			}
 		}
 		$menu.toggleClass(options.leftClass, direction == 'left').toggleClass(options.rightClass, direction == 'right');
 
-		if (verticalDirection == 'auto')
-		{
+		if (verticalDirection == 'auto') {
 			if ((t_offset.top - $(window).scrollTop()) < windowHeight * 0.7) {
 				verticalDirection = 'down';
 			} else {
@@ -61,11 +61,11 @@ function toggleBCDropdown($trigger, show)
 		$menu.toggleClass(options.upClass, verticalDirection == 'up').toggleClass(options.downClass, verticalDirection == 'down');
 
 		// Use jQuery UI to construct the menu
-		$menu.children('.dropdown-contents').menu({ position: { my: 'left top', at: 'right top-' + padding } });
+		$menu.children('.dropdown-contents').menu({ position: { my: flyout_dir + ' top', at: direction + ' top-' + padding, collision: 'flipfit' } });
 
 		// Show the menu
 		parent.toggleClass(options.visibleClass, true);
-		if (verticalDirection == 'up') {
+		if (direction == 'left' || verticalDirection == 'up' || (windowWidth - t_offset.left + $trigger.outerWidth()) < 300 ) {
 			$menu.css('height', $menu.height()); // Fix weird issue where container height is messed up
 			$menu.fadeIn(300);
 		} else {
@@ -74,40 +74,33 @@ function toggleBCDropdown($trigger, show)
 		$menu.toggleClass('dropdown-visible', true);
 
 		// Position the menu
-		if (verticalDirection == 'up')
-		{
+		if (verticalDirection == 'up') {
+			$menu.css('top', t_offset.top - $menu.outerHeight() + 'px');
+		} else {
+			$menu.css('top', t_offset.top + $trigger.height() + 'px');
+		}
+
+		if (direction == 'left') {
 			$menu.css({
 				marginLeft: 0,
-				left: t_offset.left + 'px',
-				top: t_offset.top - $menu.outerHeight() + 'px',
+				left: t_offset.left + $trigger.outerWidth() - $menu.outerWidth() + 'px',
 			});
 		} else {
 			$menu.css({
 				marginLeft: 0,
 				left: t_offset.left + 'px',
-				top: t_offset.top + $trigger.height() + 'px',
 			});
 		}
 
 		var m_offset = $menu.offset().left,
-			width = $menu.outerWidth(true); // probably won't work during animation
+			width = $menu.outerWidth(); // won't work for show() animation
 
+		// Detect edge overflow and try to fix
 		if (m_offset < 2) {
-			$menu.css('left', (2 - m_offset) + 'px');
+			$menu.css('margin-left', (2 - m_offset) + 'px');
 		}
 		else if ((m_offset + width + 2) > windowWidth) {
 			$menu.css('margin-left', (windowWidth - m_offset - width - 2) + 'px');
-		}
-
-		//$menu.css('max-height', (windowHeight - t_offset.top - $trigger.height()) + 'px');
-
-		// TODO: check if this actually works
-		var freeSpace = parent.offset().left - 4;
-
-		if (direction == 'left') {
-			$menu.css('margin-left', '-' + freeSpace + 'px');
-		} else {
-			$menu.css('margin-right', '-' + (windowWidth + freeSpace) + 'px');
 		}
 
 	} else if(show && visible) {
@@ -119,10 +112,17 @@ function toggleBCDropdown($trigger, show)
 		parent.toggleClass(options.visibleClass, false);
 		$menu.toggleClass('dropdown-visible', false);
 		$menu.stop(true);
-		$menu.hide(300, function(){
-			$menu.children('.dropdown-contents').menu('destroy');
-			$menu.remove();
-		});
+		if ($menu.hasClass('dropdown-left', 'dropdown-up')) {
+			$menu.fadeOut(300, function(){
+				$menu.children('.dropdown-contents').menu('destroy');
+				$menu.remove();
+			});
+		} else {
+			$menu.hide(300, function(){
+				$menu.children('.dropdown-contents').menu('destroy');
+				$menu.remove();
+			});
+		}
 	}
 
 	// Prevent event propagation
