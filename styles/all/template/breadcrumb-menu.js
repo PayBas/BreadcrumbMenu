@@ -61,7 +61,7 @@ function toggleBCDropdown($trigger, show)
 		$menu.toggleClass(options.upClass, verticalDirection == 'up').toggleClass(options.downClass, verticalDirection == 'down');
 
 		// Use jQuery UI to construct the menu
-		$menu.children('.dropdown-contents').menu({ position: { my: flyout_dir + ' top', at: direction + ' top-' + padding, collision: 'flipfit' } });
+		$menu.children('.dropdown-contents').menu({ position: { my: flyout_dir + ' top', at: direction + ' top-' + padding, collision: 'flipfit' }, icons: {submenu: ''} });
 
 		// Show the menu
 		parent.toggleClass(options.visibleClass, true);

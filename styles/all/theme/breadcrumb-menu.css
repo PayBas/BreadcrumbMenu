@@ -53,7 +53,8 @@
 	right: auto;
 }
 
-#breadcrumb-menu a:hover {
+#breadcrumb-menu a:hover,
+#breadcrumb-menu .ui-state-active {
 	background: rgba(100,100,100,0.05);
 }
 #breadcrumb-menu .current > a {
