@@ -25,16 +25,13 @@ class listener implements EventSubscriberInterface
 	/** @var \phpbb\auth\auth */
 	protected $auth;
 
-	/** @var \phpbb\cache\driver\driver_interface */
-	protected $cache;
-
 	/** @var \phpbb\config\config */
 	protected $config;
 
-	/** @var \phpbb\db\driver\driver */
+	/** @var \phpbb\db\driver\driver_interface */
 	protected $db;
 
-	/** @var \phpbb\request\request */
+	/** @var \phpbb\request\request_interface */
 	protected $request;
 
 	/** @var \phpbb\template\template */
@@ -49,10 +46,9 @@ class listener implements EventSubscriberInterface
 	/** @var string PHP extension */
 	protected $phpEx;
 
-	public function __construct(\phpbb\auth\auth $auth, \phpbb\cache\service $cache, \phpbb\config\config $config, \phpbb\db\driver\driver $db, \phpbb\request\request $request, \phpbb\template\template $template, \phpbb\user $user, $root_path, $phpEx)
+	public function __construct(\phpbb\auth\auth $auth, \phpbb\config\config $config, \phpbb\db\driver\driver_interface $db, \phpbb\request\request_interface $request, \phpbb\template\template $template, \phpbb\user $user, $root_path, $phpEx)
 	{
 		$this->auth = $auth;
-		$this->cache = $cache;
 		$this->config = $config;
 		$this->db = $db;
 		$this->request = $request;

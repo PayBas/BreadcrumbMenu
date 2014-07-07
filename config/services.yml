@@ -3,7 +3,6 @@ services:
         class: paybas\breadcrumbmenu\event\listener
         arguments:
             - @auth
-            - @cache
             - @config
             - @dbal.conn
             - @request
