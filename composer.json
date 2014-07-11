@@ -3,7 +3,7 @@
     "type": "phpbb-extension",
     "description": "This extension adds a drop-down menu to each breadcrumb, containing the sibling and child forums.",
     "homepage": "http://paybas.com/",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "time": "2014-06-25",
     "license": "GPL-2.0",
     "authors": [
