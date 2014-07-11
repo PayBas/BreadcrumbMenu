@@ -11,7 +11,7 @@ Extension for phpBB 3.1 to turn the breadcrumb navigation into a forum tree menu
 - Auto-hide when the user moves the cursor outside of the menu. 
 
 #### Requirements
-- phpBB 3.1-RC1 or higher
+- phpBB 3.1-RC2 or higher
 - PHP 5.3.3 or higher
 
 #### Languages supported
