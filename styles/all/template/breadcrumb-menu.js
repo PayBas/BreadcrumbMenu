@@ -160,7 +160,7 @@ $(document).ready(function($)
 			crumb;
 
 		if(typeof forum_ref != 'undefined') {
-			crumb = forum_ref
+			crumb = forum_ref;
 		} else if(!isNaN(forum_id)) {
 			crumb = forum_id;
 		} else {

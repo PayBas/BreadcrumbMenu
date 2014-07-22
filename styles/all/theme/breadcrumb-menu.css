@@ -15,7 +15,7 @@
 	max-height: inherit;
 	max-width: 250px !important;
 	min-width: 130px;
-	overflow: inherit;
+	overflow: visible;
 }
 
 #breadcrumb-menu li {
