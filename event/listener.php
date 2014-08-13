@@ -86,7 +86,7 @@ class listener implements EventSubscriberInterface
 
 		unset($list, $tree);
 
-		if(!empty($html))
+		if (!empty($html))
 		{
 			$this->template->assign_vars(array(
 				'BREADCRUMB_MENU' => $html,
@@ -177,7 +177,7 @@ class listener implements EventSubscriberInterface
 	{
 		$parents = array();
 		
-		if($current_id == 0 || empty($list))
+		if ($current_id == 0 || empty($list))
 		{
 			return $parents; // skip if we're not viewing a forum right now
 		}
@@ -202,7 +202,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function mark_current($list, $current_id, $parents)
 	{
-		if($current_id == 0 || empty($list))
+		if ($current_id == 0 || empty($list))
 		{
 			return $list; // skip if we're not viewing a forum right now
 		}
@@ -211,12 +211,12 @@ class listener implements EventSubscriberInterface
 
 		foreach($parents as $key => $forum_id)
 		{
-			if(isset($list[$forum_id]))
+			if (isset($list[$forum_id]))
 			{
 				$list[$forum_id]['current'] = true;
 
 				// we need this to assign an #id to each crumb branch
-				if($list[$forum_id]['parent_id'] >= 0)
+				if ($list[$forum_id]['parent_id'] >= 0)
 				{
 					$parent_id = $list[$forum_id]['parent_id'];
 					$list[$parent_id]['current_child'] = (int) $forum_id;
