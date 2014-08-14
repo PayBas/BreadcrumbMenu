@@ -68,7 +68,7 @@ class listener implements EventSubscriberInterface
 	/**
 	* The main script, orchestrating all steps of the process
 	*/
-	public function generate_menu($event)
+	public function generate_menu()
 	{
 		// When the event is dispatched from posting.php, the forum_id is not passed, 
 		// so its better to use request->variable instead of $event['item_id']

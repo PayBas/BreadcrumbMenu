@@ -3,6 +3,8 @@
 */
 function toggleBCDropdown($trigger, show)
 {
+	'use strict';
+
 	if(!$trigger) {
 		// Hide all dropdown menus, because there is no trigger (meaning a time-out)
 		$('.breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
@@ -12,9 +14,10 @@ function toggleBCDropdown($trigger, show)
 	var options = $trigger.data('dropdown-options'),
 		parent = options.parent,
 		visible = parent.hasClass(options.visibleClass),
-		crumb = options.crumb;
+		crumb = options.crumb,
 		$container = $('#breadcrumb-menu'),
-		pointer = '<div class="pointer"><div class="pointer-inner"></div></div>';
+		pointer = '<div class="pointer"><div class="pointer-inner"></div></div>',
+		$menu;
 
 	if(show && !visible) {
 		// Hide all other dropdown menus
@@ -22,8 +25,8 @@ function toggleBCDropdown($trigger, show)
 
 		// A new crumb has been triggered, so make a new drop-down
 		$container.append('<div id="crumb-menu-' + crumb + '" class="dropdown hidden"></div>');
-		var $menu = $container.children('#breadcrumb-menu #crumb-menu-' + crumb);
-		var $source = $('#breadcrumb-menu #crumb-' + crumb);
+		$menu = $container.children('#crumb-menu-' + crumb);
+		var $source = $container.find('#crumb-' + crumb);
 		var dropdown_contents = '<ul class="dropdown-contents">' + $source.html() + '</ul>';
 		$menu.html(pointer + dropdown_contents);
 		var $dropdown_contents = $menu.find('.dropdown-contents');
@@ -83,12 +86,12 @@ function toggleBCDropdown($trigger, show)
 		if (direction == 'left') {
 			$menu.css({
 				marginLeft: 0,
-				left: t_offset.left + $trigger.outerWidth() - $menu.outerWidth() + 'px',
+				left: t_offset.left + $trigger.outerWidth() - $menu.outerWidth() + 'px'
 			});
 		} else {
 			$menu.css({
 				marginLeft: 0,
-				left: t_offset.left + 'px',
+				left: t_offset.left + 'px'
 			});
 		}
 
@@ -103,22 +106,20 @@ function toggleBCDropdown($trigger, show)
 			$menu.css('margin-left', (windowWidth - m_offset - width - 2) + 'px');
 		}
 
-	} else if(show && visible) {
-		// Keep it open, do nothing
-	} else {
+	} else if (!(show && visible)) {
 		// Hide & destroy a menu
-		var $menu = $('#breadcrumb-menu #crumb-menu-' + crumb);
+		$menu = $('#breadcrumb-menu').find('#crumb-menu-' + crumb);
 
 		parent.toggleClass(options.visibleClass, false);
 		$menu.toggleClass('dropdown-visible', false);
 		$menu.stop(true);
-		if ($menu.hasClass('dropdown-left', 'dropdown-up')) {
-			$menu.fadeOut(300, function(){
+		if ($menu.is('dropdown-left, dropdown-up')) {
+			$menu.fadeOut(300, function() {
 				$menu.children('.dropdown-contents').menu('destroy');
 				$menu.remove();
 			});
 		} else {
-			$menu.hide(300, function(){
+			$menu.hide(300, function() {
 				$menu.children('.dropdown-contents').menu('destroy');
 				$menu.remove();
 			});
@@ -135,10 +136,12 @@ function toggleBCDropdown($trigger, show)
 		catch (error) { }
 	}
 	return false;
-};
+}
 
 $(document).ready(function($)
 {
+	'use strict';
+
 	var showTimer,
 		hideTimer,
 		touchTimer;
@@ -159,7 +162,7 @@ $(document).ready(function($)
 			forum_id = parseInt($trigger.attr('data-forum-id')),
 			crumb;
 
-		if(typeof forum_ref != 'undefined') {
+		if(typeof forum_ref !== 'undefined') {
 			crumb = forum_ref;
 		} else if(!isNaN(forum_id)) {
 			crumb = forum_id;
@@ -176,7 +179,7 @@ $(document).ready(function($)
 				rightClass: 'dropdown-right', // Class to add to parent item when dropdown opens to right side
 				upClass: 'dropdown-up', // Class to add to parent item when dropdown opens above menu item
 				downClass: 'dropdown-down', // Class to add to parent item when dropdown opens below menu item
-				crumb: crumb,
+				crumb: crumb
 			};
 
 		// assign data to the trigger element
@@ -189,14 +192,14 @@ $(document).ready(function($)
 				{
 					event.preventDefault();
 				},
-				'touchstart': function(event)
+				'touchstart': function()
 				{
 					touchTimer = setTimeout(function() {
 						clearTimeout(touchTimer);
 						touchTimer = true;
 					}, 300);
 				},
-				'touchend': function(event)
+				'touchend': function()
 				{
 					if (touchTimer === true) {
 						location.href = $trigger.attr('href');
@@ -210,7 +213,7 @@ $(document).ready(function($)
 			'mouseenter': function()
 			{
 				clearTimeout(hideTimer);
-	
+
 				showTimer = setTimeout(function() {
 					toggleBCDropdown($trigger, true);
 					$(phpbb.dropdownHandles).each(phpbb.toggleDropdown);
