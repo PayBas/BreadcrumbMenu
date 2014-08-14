@@ -1,21 +1,21 @@
 <?php
 
 /**
-*
-* @package Breadcrumb Menu Extension
-* @copyright (c) 2014 PayBas
-* @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
-*
-*/
+ *
+ * @package Breadcrumb Menu Extension
+ * @copyright (c) 2014 PayBas
+ * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
+ *
+ */
 
 namespace paybas\breadcrumbmenu\event;
 
 /**
-* @ignore
-*/
+ * @ignore
+ */
 if (!defined('IN_PHPBB'))
 {
-    exit;
+	exit;
 }
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -39,10 +39,10 @@ class listener implements EventSubscriberInterface
 
 	/** @var \phpbb\user */
 	protected $user;
-	
+
 	/** @var string phpBB root path */
 	protected $root_path;
-	
+
 	/** @var string PHP extension */
 	protected $phpEx;
 
@@ -66,8 +66,8 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	* The main script, orchestrating all steps of the process
-	*/
+	 * The main script, orchestrating all steps of the process
+	 */
 	public function generate_menu()
 	{
 		// When the event is dispatched from posting.php, the forum_id is not passed, 
@@ -95,8 +95,8 @@ class listener implements EventSubscriberInterface
 	}
 
 	/**
-	* Modified version of the jumpbox, just lists authed forums (in the correct order)
-	*/
+	 * Modified version of the jumpbox, just lists authed forums (in the correct order)
+	 */
 	function get_forum_list($ignore_id = false, $ignore_acl = false, $ignore_nonpost = false, $ignore_emptycat = true, $only_acl_post = false)
 	{
 		// This query is identical to the jumpbox one
@@ -107,20 +107,20 @@ class listener implements EventSubscriberInterface
 
 		// We include the forum root/index to make tree traversal easier
 		$forum_list[0] = array(
-			'forum_id' 		=> '0',
-			'forum_name' 	=> $this->user->lang['FORUMS'],
-			'forum_type' 	=> '0',
-			'link' 			=> append_sid("{$this->root_path}index.$this->phpEx"),
-			'parent_id' 	=> false,
-			'current'		=> false,
-			'current_child'	=> false,
-			'disabled' 		=> false,
+			'forum_id'      => '0',
+			'forum_name'    => $this->user->lang['FORUMS'],
+			'forum_type'    => '0',
+			'link'          => append_sid("{$this->root_path}index.$this->phpEx"),
+			'parent_id'     => false,
+			'current'       => false,
+			'current_child' => false,
+			'disabled'      => false,
 		);
-	
+
 		// Sometimes it could happen that forums will be displayed here not be displayed within the index page
 		// This is the result of forums not displayed at index, having list permissions and a parent of a forum with no permissions.
 		// If this happens, the padding could be "broken"
-	
+
 		while ($row = $this->db->sql_fetchrow($result))
 		{
 			$disabled = false;
@@ -136,7 +136,7 @@ class listener implements EventSubscriberInterface
 			{
 				continue;
 			}
-	
+
 			if (
 				((is_array($ignore_id) && in_array($row['forum_id'], $ignore_id)) || $row['forum_id'] == $ignore_id)
 				||
@@ -144,21 +144,21 @@ class listener implements EventSubscriberInterface
 				($row['forum_type'] == FORUM_CAT && ($row['left_id'] + 1 == $row['right_id']) && $ignore_emptycat)
 				||
 				($row['forum_type'] != FORUM_POST && $ignore_nonpost)
-				)
+			)
 			{
 				$disabled = true;
 			}
 
 			$u_viewforum = append_sid("{$this->root_path}viewforum.$this->phpEx", 'f=' . $row['forum_id']);
 			$forum_list[$row['forum_id']] = array(
-				'forum_id' 		=> $row['forum_id'],
-				'forum_name' 	=> $row['forum_name'],
-				'forum_type' 	=> $row['forum_type'],
-				'link' 			=> $u_viewforum,
-				'parent_id' 	=> $row['parent_id'],
-				'current'		=> false,
-				'current_child'	=> false,
-				'disabled' 		=> $disabled,
+				'forum_id'      => $row['forum_id'],
+				'forum_name'    => $row['forum_name'],
+				'forum_type'    => $row['forum_type'],
+				'link'          => $u_viewforum,
+				'parent_id'     => $row['parent_id'],
+				'current'       => false,
+				'current_child' => false,
+				'disabled'      => $disabled,
 			);
 		}
 		$this->db->sql_freeresult($result);
@@ -169,36 +169,37 @@ class listener implements EventSubscriberInterface
 	/**
 	 * Get an array of all the current forum's parents
 	 *
-	 * @param	$list		mixed	The list
-	 * @param	$current_id	int		The id of the current forum
-	 * @return	$parents	array	The parents of the current_id
+	 * @param    $list          mixed    The list
+	 * @param    $current_id    int        The id of the current forum
+	 * @return array $parents    The parents of the current_id
 	 */
 	public function get_crumb_parents($list, $current_id)
 	{
 		$parents = array();
-		
+
 		if ($current_id == 0 || empty($list))
 		{
 			return $parents; // skip if we're not viewing a forum right now
 		}
-		
+
 		$parent_id = $list[$current_id]['parent_id'];
-		
-		while($parent_id)
+
+		while ($parent_id)
 		{
-			$parents[] = (int) $parent_id;
+			$parents[] = (int)$parent_id;
 			$parent_id = $list[$parent_id]['parent_id'];
 		}
+
 		return array_reverse($parents);
 	}
 
 	/**
 	 * Marks the current forum being viewed (and it's parents)
 	 *
-	 * @param	$list		mixed	The list
-	 * @param	$current_id	int		The id of the current forum
-	 * @param	$parents	array	The parents of the current_id
-	 * @return	$list		mixed	The updated list
+	 * @param    $list          mixed    The list
+	 * @param    $current_id    int        The id of the current forum
+	 * @param    $parents       array    The parents of the current_id
+	 * @return mixed $list    The updated list
 	 */
 	public function mark_current($list, $current_id, $parents)
 	{
@@ -209,7 +210,7 @@ class listener implements EventSubscriberInterface
 
 		$parents[] = $current_id;
 
-		foreach($parents as $key => $forum_id)
+		foreach ($parents as $forum_id)
 		{
 			if (isset($list[$forum_id]))
 			{
@@ -219,10 +220,11 @@ class listener implements EventSubscriberInterface
 				if ($list[$forum_id]['parent_id'] >= 0)
 				{
 					$parent_id = $list[$forum_id]['parent_id'];
-					$list[$parent_id]['current_child'] = (int) $forum_id;
+					$list[$parent_id]['current_child'] = (int)$forum_id;
 				}
 			}
 		}
+
 		return $list;
 	}
 
@@ -230,25 +232,27 @@ class listener implements EventSubscriberInterface
 	 * Generate a structured forum tree (multi-dimensional array)
 	 * Thanks to Nicofuma
 	 *
-	 * @param	$list	mixed	The list
-	 * @return	$tree	mixed	The tree
+	 * @param    $list    mixed    The list
+	 * @return    $tree    mixed    The tree
 	 */
 	public function build_tree($list)
 	{
 		reset($list);
 		$tree[0] = $this->build_tree_rec($list, sizeof($list));
+
 		return $tree;
 	}
-	
+
 	/**
 	 * Generate a structured forum tree (multi-dimensional array) with a recursive strategy
 	 * Thanks to Nicofuma
 	 *
-	 * @param	$list		mixed	The list
-	 * @param	$length		int		The length of the list
-	 * @return	$tree		mixed	The tree
+	 * @param    $list          mixed    The list
+	 * @param    $length        int        The length of the list
+	 * @return bool|mixed $tree    The tree
 	 */
-	public function build_tree_rec(&$list, $length) {
+	public function build_tree_rec(&$list, $length)
+	{
 		// Is the whole list treated ?
 		if (current($list) === false)
 		{
@@ -261,10 +265,11 @@ class listener implements EventSubscriberInterface
 		while (current($list) !== false)
 		{
 			$next = next($list);
-			if (! ($tree['forum_id'] == $next['parent_id']))
+			if (!($tree['forum_id'] == $next['parent_id']))
 			{
 				// The current node isn't our child, so we backwards and we return the current tree
 				prev($list);
+
 				return $tree;
 			}
 			else
@@ -273,24 +278,28 @@ class listener implements EventSubscriberInterface
 				$tree['children'][] = $this->build_tree_rec($list, $length);
 			}
 		}
+
 		return $tree;
 	}
 
 	/**
 	 * Build the tree HTML output (recursively)
 	 *
-	 * @param	$tree	mixed	The tree
-	 * @return	$html	string	The HTML output
+	 * @param    $tree    mixed    The tree
+	 * @return string $html      The HTML output
 	 */
 	public function build_output($tree)
 	{
 		$html = $childhtml = '';
 
-		foreach ($tree as $key => $values)
+		foreach ($tree as $values)
 		{
-			if (isset($values['children'])) {
+			if (isset($values['children']))
+			{
 				$childhtml = $this->build_output($values['children']);
-			} else {
+			}
+			else
+			{
 				$childhtml = '';
 			}
 
@@ -310,6 +319,7 @@ class listener implements EventSubscriberInterface
 
 			$html .= "</li>\n";
 		}
+
 		return $html;
 	}
 }

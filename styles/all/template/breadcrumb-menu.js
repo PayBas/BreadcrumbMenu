@@ -138,7 +138,7 @@ function toggleBCDropdown($trigger, show)
 	return false;
 }
 
-$(document).ready(function($)
+$(function()
 {
 	'use strict';
 
