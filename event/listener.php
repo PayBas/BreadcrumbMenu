@@ -70,7 +70,7 @@ class listener implements EventSubscriberInterface
 	 */
 	public function generate_menu()
 	{
-		// When the event is dispatched from posting.php, the forum_id is not passed, 
+		// When the event is dispatched from posting.php, the forum_id is not passed,
 		// so its better to use request->variable instead of $event['item_id']
 		$current_id = $this->request->variable('f', 0);
 
@@ -125,7 +125,7 @@ class listener implements EventSubscriberInterface
 		{
 			$disabled = false;
 
-			if (!$ignore_acl && $this->auth->acl_gets(array('f_list', 'a_forum', 'a_forumadd', 'a_forumdel'), $row['forum_id']))
+			if (!$ignore_acl && $this->auth->acl_gets(array('f_list', 'f_read'), $row['forum_id']))
 			{
 				if ($only_acl_post && !$this->auth->acl_get('f_post', $row['forum_id']) || (!$this->auth->acl_get('m_approve', $row['forum_id']) && !$this->auth->acl_get('f_noapprove', $row['forum_id'])))
 				{
