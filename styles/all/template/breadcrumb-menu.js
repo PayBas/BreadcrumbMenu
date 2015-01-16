@@ -163,7 +163,11 @@ $(function()
 			crumb;
 
 		if(typeof forum_ref !== 'undefined') {
-			crumb = forum_ref;
+			if(forum_ref === 'portal') {
+				return;
+			} else {
+				crumb = forum_ref;
+			}
 		} else if(!isNaN(forum_id)) {
 			crumb = forum_id;
 		} else {
