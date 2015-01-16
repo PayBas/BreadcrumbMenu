@@ -1,10 +1,54 @@
-<!-- IF BREADCRUMB_MENU -->
+{% if BREADCRUMB_MENU %}
 <div id="breadcrumb-menu">
 	<ul id="crumb-index" class="hidden">
-		{BREADCRUMB_MENU}
+		{{ BREADCRUMB_MENU }}
+
+		{% if U_NEWSPAGE %}
+			<li{% if NEWS_TITLE is defined %} class="current"{% endif %}><a href="{{ U_NEWSPAGE }}">{{ lang('NEWSPAGE') }}</a></li>
+		{% endif %}
+
+		{% if S_OVERALL_HEADER_NAVIGATION_PREPEND %}
+			{% for link in loops.overall_header_navigation_prepend_links %}
+				<li{% if PAGE_TITLE == link.LINK_TITLE %} class="current"{% endif %}><a href="{{ link.U_LINK_URL }}">{{ link.LINK_TITLE }}</a></li>
+			{% endfor %}
+		{% endif %}
+
+		{% if S_OVERALL_HEADER_NAVIGATION_APPEND %}
+			{% for link in loops.overall_header_navigation_append_links %}
+				<li{% if PAGE_TITLE == link.LINK_TITLE %} class="current"{% endif %}><a href="{{ link.U_LINK_URL }}">{{ link.LINK_TITLE }}</a></li>
+			{% endfor %}
+		{% endif %}
+
+		{% if S_OVERALL_FOOTER_TEAMLINK_AFTER %}
+			{% for link in loops.overall_footer_teamlink_after_links %}
+				<li{% if PAGE_TITLE == link.LINK_TITLE %} class="current"{% endif %}><a href="{{ link.U_LINK_URL }}">{{ link.LINK_TITLE }}</a></li>
+			{% endfor %}
+		{% endif %}
+
+		{% if S_OVERALL_FOOTER_TEAMLINK_BEFORE %}
+			{% for link in loops.overall_footer_teamlink_before_links %}
+				<li{% if PAGE_TITLE == link.LINK_TITLE %} class="current"{% endif %}><a href="{{ link.U_LINK_URL }}">{{ link.LINK_TITLE }}</a></li>
+			{% endfor %}
+		{% endif %}
+
+		{% if S_OVERALL_FOOTER_TIMEZONE_AFTER %}
+			{% for link in loops.overall_footer_timezone_after_links %}
+				<li{% if PAGE_TITLE == link.LINK_TITLE %} class="current"{% endif %}><a href="{{ link.U_LINK_URL }}">{{ link.LINK_TITLE }}</a></li>
+			{% endfor %}
+		{% endif %}
+
+		{% if S_OVERALL_FOOTER_TIMEZONE_BEFORE %}
+			{% for link in loops.overall_footer_timezone_before_links %}
+				<li{% if PAGE_TITLE == link.LINK_TITLE %} class="current"{% endif %}><a href="{{ link.U_LINK_URL }}">{{ link.LINK_TITLE }}</a></li>
+			{% endfor %}
+		{% endif %}
+
+		{% if S_BOARDRULES_LINK_ENABLED %}
+			<li{% if BOARDRULES_EXPLAIN is defined %} class="current"{% endif %}><a href="{{ U_BOARDRULES }}">{{ lang('BOARDRULES') }}</a></li>
+		{% endif %}
 	</ul>
 </div>
 
 <!-- INCLUDEJS @paybas_breadcrumbmenu/jquery-ui-1.11.1.custom.min.js -->
 <!-- INCLUDEJS @paybas_breadcrumbmenu/breadcrumb-menu.js -->
-<!-- ENDIF -->
+{% endif %}
