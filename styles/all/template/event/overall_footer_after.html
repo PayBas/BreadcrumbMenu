@@ -44,7 +44,7 @@
 		{% endif %}
 
 		{% if S_BOARDRULES_LINK_ENABLED %}
-			<li{% if BOARDRULES_EXPLAIN is defined %} class="current"{% endif %}><a href="{{ U_BOARDRULES }}">{{ lang('BOARDRULES') }}</a></li>
+			<li{% if S_BOARD_RULES %} class="current"{% endif %}><a href="{{ U_BOARDRULES }}">{{ lang('BOARDRULES') }}</a></li>
 		{% endif %}
 	</ul>
 </div>

@@ -18,6 +18,14 @@
 	overflow: visible;
 }
 
+#breadcrumb-menu .dropdown-up {
+	padding: 0 0 9px;
+}
+#breadcrumb-menu .dropdown-left .pointer {
+	left: auto;
+	right: 10px;
+}
+
 #breadcrumb-menu li {
 	margin: 0;
 	padding: 0;
@@ -32,7 +40,7 @@
 #breadcrumb-menu a {
 	display: block;
 	font-weight: normal;
-	padding: 4px 12px 4px 4px;
+	padding: 5px 12px 5px 4px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -46,6 +54,7 @@
 	font-weight: bold;
 	position: absolute;
 	right: 2px;
+	text-decoration: none !important;
 }
 #breadcrumb-menu .dropdown-left .children > a:before {
 	content: '\2039';
@@ -54,9 +63,7 @@
 }
 
 #breadcrumb-menu a:hover,
-#breadcrumb-menu .ui-state-active {
-	background: rgba(100,100,100,0.05);
-}
+#breadcrumb-menu .ui-state-active,
 #breadcrumb-menu .current > a {
 	background: rgba(100,100,100,0.05);
 }
@@ -65,12 +72,40 @@
 	position: absolute;
 }
 
-#breadcrumb-menu .dropdown-up {
-	padding: 0 0 9px;
+#breadcrumb-menu .touch-trigger {
+	display: none;
+	position: absolute;
+	height: auto;
+	right: 0;
+	top: 0;
+	bottom: 0;
 }
-#breadcrumb-menu .dropdown-left .pointer {
-    left: auto;
-    right: 10px;
+#breadcrumb-menu .touch-trigger:before {
+	content: '\00BB';
+	display: inline-block;
+	font-size: 16px;
+	line-height: 1;
+	vertical-align: baseline;
+}
+#breadcrumb-menu .dropdown-left .touch-trigger {
+	left: 0;
+	right: auto;
+}
+#breadcrumb-menu .dropdown-left .touch-trigger:before {
+	content: '\00AB';
+}
+
+#breadcrumb-menu.touch-enabled a {
+	padding-right: 30px;
+	padding-bottom: 7px;
+	padding-top: 7px;
+}
+#breadcrumb-menu.touch-enabled .dropdown-left a {
+	padding-left: 30px;
+	padding-right: 4px;
+}
+#breadcrumb-menu.touch-enabled .touch-trigger {
+	display: block;
 }
 
 .rtl #breadcrumb-menu .children > a:before {
@@ -79,7 +114,12 @@
 .rtl #breadcrumb-menu .dropdown-left .children > a:before {
 	content: '\203A';
 }
-
+.rtl #breadcrumb-menu .touch-trigger:before {
+	content: '\00AB';
+}
+.rtl #breadcrumb-menu .dropdown-left .touch-trigger:before {
+	content: '\00BB';
+}
 
 /* responsive design */
 @media only screen and (max-width: 550px), only screen and (max-device-width: 550px) {

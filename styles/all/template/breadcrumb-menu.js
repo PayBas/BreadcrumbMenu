@@ -5,21 +5,21 @@ function toggleBCDropdown($trigger, show)
 {
 	'use strict';
 
-	if(!$trigger) {
+	if (!$trigger) {
 		// Hide all dropdown menus, because there is no trigger (meaning a time-out)
 		$('.breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
 		return;
 	}
 
 	var options = $trigger.data('dropdown-options'),
-		parent = options.parent,
-		visible = parent.hasClass(options.visibleClass),
+		$parent = options.parent,
+		visible = $parent.hasClass(options.visibleClass),
 		crumb = options.crumb,
 		$container = $('#breadcrumb-menu'),
 		pointer = '<div class="pointer"><div class="pointer-inner"></div></div>',
 		$menu;
 
-	if(show && !visible) {
+	if (show && !visible) {
 		// Hide all other dropdown menus
 		$('.breadcrumbs .visible').find('a.dropdown-trigger').each(function(){ toggleBCDropdown($(this), false); });
 
@@ -67,7 +67,7 @@ function toggleBCDropdown($trigger, show)
 		$menu.children('.dropdown-contents').menu({ position: { my: flyout_dir + ' top', at: direction + ' top-' + padding, collision: 'flipfit' }, icons: {submenu: ''} });
 
 		// Show the menu
-		parent.toggleClass(options.visibleClass, true);
+		$parent.toggleClass(options.visibleClass, true);
 		if (direction == 'left' || verticalDirection == 'up' || (windowWidth - t_offset.left + $trigger.outerWidth()) < 300 ) {
 			$menu.css('height', $menu.height()); // Fix weird issue where container height is messed up
 			$menu.fadeIn(300);
@@ -110,7 +110,7 @@ function toggleBCDropdown($trigger, show)
 		// Hide & destroy a menu
 		$menu = $('#breadcrumb-menu').find('#crumb-menu-' + crumb);
 
-		parent.toggleClass(options.visibleClass, false);
+		$parent.toggleClass(options.visibleClass, false);
 		$menu.toggleClass('dropdown-visible', false);
 		$menu.stop(true);
 		if ($menu.is('dropdown-left, dropdown-up')) {
@@ -152,7 +152,7 @@ $(function()
 		var $trigger = $this.find('a');
 
 		// if a crumb doesn't have a link, do nothing
-		if(!$trigger.length) { return; }
+		if (!$trigger.length) { return; }
 
 		// remove those annoying title tooltips
 		$trigger.removeAttr('title');
@@ -162,13 +162,9 @@ $(function()
 			forum_id = parseInt($trigger.attr('data-forum-id')),
 			crumb;
 
-		if(typeof forum_ref !== 'undefined') {
-			if(forum_ref === 'portal') {
-				return;
-			} else {
-				crumb = forum_ref;
-			}
-		} else if(!isNaN(forum_id)) {
+		if (forum_ref === 'index') {
+			crumb = forum_ref;
+		} else if (!isNaN(forum_id)) {
 			crumb = forum_id;
 		} else {
 			return;
@@ -190,6 +186,7 @@ $(function()
 		$trigger.addClass('dropdown-trigger');
 		$trigger.data('dropdown-options', ops);
 
+		// if the user has a touch-screen, don't open the crumb URL; open the menu instead
 		if (phpbb.isTouch) {
 			$trigger.on({
 				'click' : function(event)
@@ -221,7 +218,7 @@ $(function()
 				showTimer = setTimeout(function() {
 					toggleBCDropdown($trigger, true);
 					$(phpbb.dropdownHandles).each(phpbb.toggleDropdown);
-				}, 300);
+				}, 400);
 			},
 			'mouseleave': function()
 			{
@@ -242,4 +239,9 @@ $(function()
 			}, 700);
 		}
 	});
+
+	// add fly-out trigger buttons for touch devices
+	if (phpbb.isTouch) {
+		$('#breadcrumb-menu').addClass('touch-enabled');
+	}
 });

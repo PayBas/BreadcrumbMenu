@@ -304,7 +304,6 @@ class listener implements EventSubscriberInterface
 			}
 
 			$class = (!empty($childhtml)) ? 'children' : '';
-
 			$class .= ($values['current'] == true) ? ' current' : '';
 
 			$html .= '<li' . ((!empty($class)) ? ' class="' . $class . '"' : '') . '>';
@@ -312,7 +311,12 @@ class listener implements EventSubscriberInterface
 
 			if (!empty($childhtml))
 			{
-				$html .= '<ul ' . (!empty($values['current_child']) ? ('id="crumb-' . $values['current_child'] . '" ') : '') . 'class="fly-out dropdown-contents hidden">';
+				$html .= '<div class="touch-trigger button"></div>';
+			}
+
+			if (!empty($childhtml))
+			{
+				$html .= "\n<ul " . (!empty($values['current_child']) ? ('id="crumb-' . $values['current_child'] . '" ') : '') . 'class="fly-out dropdown-contents hidden">';
 				$html .= $childhtml;
 				$html .= '</ul>';
 			}
