@@ -51,6 +51,7 @@
 }
 #breadcrumb-menu .children > a:before {
 	content: '\203A';
+	direction: ltr;
 	font-weight: bold;
 	position: absolute;
 	right: 2px;
@@ -82,6 +83,7 @@
 }
 #breadcrumb-menu .touch-trigger:before {
 	content: '\00BB';
+	direction: ltr;
 	display: inline-block;
 	font-size: 18px;
 	font-weight: normal;
@@ -101,25 +103,15 @@
 	padding-bottom: 7px;
 	padding-top: 7px;
 }
+#breadcrumb-menu.touch-enabled .children > a:before {
+	display: none;
+}
 #breadcrumb-menu.touch-enabled .dropdown-left a {
 	padding-left: 30px;
 	padding-right: 4px;
 }
 #breadcrumb-menu.touch-enabled .touch-trigger {
 	display: block;
-}
-
-.rtl #breadcrumb-menu .children > a:before {
-	content: '\2039';
-}
-.rtl #breadcrumb-menu .dropdown-left .children > a:before {
-	content: '\203A';
-}
-.rtl #breadcrumb-menu .touch-trigger:before {
-	content: '\00AB';
-}
-.rtl #breadcrumb-menu .dropdown-left .touch-trigger:before {
-	content: '\00BB';
 }
 
 /* responsive design */
