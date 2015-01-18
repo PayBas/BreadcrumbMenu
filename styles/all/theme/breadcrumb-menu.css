@@ -83,7 +83,8 @@
 #breadcrumb-menu .touch-trigger:before {
 	content: '\00BB';
 	display: inline-block;
-	font-size: 16px;
+	font-size: 18px;
+	font-weight: normal;
 	line-height: 1;
 	vertical-align: baseline;
 }
