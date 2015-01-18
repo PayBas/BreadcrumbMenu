@@ -138,7 +138,7 @@ function toggleBCDropdown($trigger, show)
 	return false;
 }
 
-$(function()
+function setupBCMenu()
 {
 	'use strict';
 
@@ -187,7 +187,7 @@ $(function()
 		$trigger.data('dropdown-options', ops);
 
 		// if the user has a touch-screen, don't open the crumb URL; open the menu instead
-		if (phpbb.isTouch) {
+		if (isTouch) {
 			$trigger.on({
 				'click' : function(event)
 				{
@@ -241,7 +241,22 @@ $(function()
 	});
 
 	// add fly-out trigger buttons for touch devices
-	if (phpbb.isTouch) {
+	if (isTouch) {
 		$('#breadcrumb-menu').addClass('touch-enabled');
 	}
+}
+
+var isTouch;
+
+$(function()
+{
+	'use strict';
+
+	var $document = $(document);
+
+	$document.one('touchstart.BCMenu mousemove.BCMenu', function(e){
+		$document.off('.BCMenu');
+		isTouch = (e.type === 'touchstart');
+		setupBCMenu();
+	});
 });
