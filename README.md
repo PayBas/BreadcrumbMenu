@@ -11,17 +11,11 @@ Extension for phpBB 3.1 to turn the breadcrumb navigation into a forum tree menu
 - Auto-hide when the user moves the cursor outside of the menu.
 
 #### Requirements
-- phpBB 3.1-RC5 or higher
+- phpBB 3.1.0 or higher
 - PHP 5.3.3 or higher
 
 #### Languages supported
 - No language files included/necessary
-
-#### To do list
-- Improve responsiveness and touch-events
-- Add support for the official pages extension (and/or board root)
-- Move away from using IDs in CSS (not completely possible untill phpBB does the same)
-- Perhaps make an ACP module so admins can set certain vars (such as animations and timers).
 
 ## Installation
 1. [Download the latest release](https://github.com/PayBas/BreadcrumbMenu/releases) and unzip it.
