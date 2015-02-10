@@ -191,7 +191,9 @@ function setupBCMenu()
 			$trigger.on({
 				'click' : function(event)
 				{
-					event.preventDefault();
+					if (!$trigger.parent().hasClass('visible')) {
+						event.preventDefault();
+					}
 				},
 				'touchstart': function()
 				{
